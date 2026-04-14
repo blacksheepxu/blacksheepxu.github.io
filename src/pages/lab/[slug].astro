@@ -1,0 +1,58 @@
+---
+import { getCollection, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollectionSlug, getPosts, type LabEntry } from "../../lib/content/posts";
+import { buildSiteStats } from "../../lib/stats/site-stats";
+import CadenceSummary from "../../components/stats/CadenceSummary.astro";
+import TopicDistributionSummary from "../../components/stats/TopicDistributionSummary.astro";
+import ParameterDemoShell from "../../components/interactive/ParameterDemoShell.astro";
+
+interface Props {
+  entry: LabEntry;
+}
+
+export const getStaticPaths = (async () => {
+  const entries = await getCollection("lab");
+  return entries.map((entry: LabEntry) => ({
+    params: { slug: getCollectionSlug(entry) },
+    props: { entry }
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props as Props;
+const { Content } = await render(entry);
+const stats = buildSiteStats(await getPosts());
+---
+
+<BaseLayout title={`${entry.data.title} | 实验`} description={entry.data.description} path="/lab">
+  <article class="page-section panel prose">
+    <div class="section-head">
+      <div>
+        <h1>{entry.data.title}</h1>
+        <p>{entry.data.description}</p>
+      </div>
+    </div>
+    <div class="meta-row">
+      <span class="meta-chip">{entry.data.kind}</span>
+      <span class="meta-chip">{entry.data.status}</span>
+    </div>
+    <Content />
+  </article>
+
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h2>轻量交互示例</h2>
+        <p>这部分演示第一版交互的边界：支持理解，不喧宾夺主。</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      <CadenceSummary buckets={stats.cadence} />
+      <TopicDistributionSummary buckets={stats.topics} />
+    </div>
+    <div style="margin-top: 1rem">
+      <ParameterDemoShell />
+    </div>
+  </section>
+</BaseLayout>

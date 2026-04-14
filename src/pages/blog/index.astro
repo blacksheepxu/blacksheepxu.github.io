@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPostHref, getPosts, type PostEntry } from "../../lib/content/posts";
+
+const posts = await getPosts();
+---
+
+<BaseLayout
+  title="博客 | Blacksheep Research"
+  description="迁入 Astro 后的博客入口，保留旧文，同时让内容重新回到研究语境里。"
+  path="/blog"
+>
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h1>博客</h1>
+        <p>这里保留旧文章，也会承载之后的新研究笔记与内容发布。</p>
+      </div>
+    </div>
+    <div class="list-grid">
+      {posts.map((post: PostEntry) => (
+        <article class="content-card">
+          <h3>
+            <a href={getPostHref(post)}>{post.data.title}</a>
+          </h3>
+          <p>{post.data.description}</p>
+          <div class="meta-row">
+            <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+            {(post.data.categories.length ? post.data.categories : ["未分类"]).slice(0, 2).map((item: string) => (
+              <span class="meta-chip">{item}</span>
+            ))}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

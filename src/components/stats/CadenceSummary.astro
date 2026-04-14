@@ -1,0 +1,20 @@
+---
+import CadenceChart from "../interactive/CadenceChart.astro";
+
+interface Props {
+  buckets: { label: string; count: number }[];
+}
+
+const { buckets } = Astro.props;
+---
+
+<div class="stack">
+  <div class="content-card">
+    <h3>记录节奏</h3>
+    <p>
+      我希望这里提供的是一种“最近有没有留下痕迹”的观察，而不是用高压的连续天数去要求自己。
+    </p>
+  </div>
+  <CadenceChart buckets={buckets} />
+</div>
+

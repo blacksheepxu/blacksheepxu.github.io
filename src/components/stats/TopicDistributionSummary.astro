@@ -1,0 +1,20 @@
+---
+import TopicDistributionChart from "../interactive/TopicDistributionChart.astro";
+
+interface Props {
+  buckets: { label: string; count: number }[];
+}
+
+const { buckets } = Astro.props;
+---
+
+<div class="stack">
+  <div class="content-card">
+    <h3>主题投入</h3>
+    <p>
+      主题分布帮助我看见自己把内容沉淀到了哪里，也方便决定下一阶段是否需要把某个方向补齐。
+    </p>
+  </div>
+  <TopicDistributionChart buckets={buckets} />
+</div>
+

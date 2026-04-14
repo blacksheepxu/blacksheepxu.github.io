@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollectionSlug, getPostHref, type PostEntry } from "../../lib/content/posts";
+
+interface Props {
+  posts: PostEntry[];
+  labEntries: CollectionEntry<"lab">[];
+}
+
+const { posts, labEntries } = Astro.props;
+---
+
+<div class="card-grid">
+  {posts.slice(0, 2).map((post) => (
+    <article class="content-card">
+      <h3>
+        <a href={getPostHref(post)}>{post.data.title}</a>
+      </h3>
+      <p>{post.data.description}</p>
+      <div class="meta-row">
+        <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+        <span class="meta-chip">{post.data.topic ?? post.data.categories[0] ?? "研究笔记"}</span>
+      </div>
+    </article>
+  ))}
+  {labEntries.slice(0, 1).map((entry) => (
+    <article class="content-card">
+      <h3>
+        <a href={`/lab/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>
+      </h3>
+      <p>{entry.data.description}</p>
+      <div class="meta-row">
+        <span class="meta-chip">实验页</span>
+        <span class="meta-chip">{entry.data.kind}</span>
+      </div>
+    </article>
+  ))}
+</div>

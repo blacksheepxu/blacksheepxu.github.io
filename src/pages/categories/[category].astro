@@ -1,0 +1,20 @@
+---
+import TaxonomyPage from "../../components/site/TaxonomyPage.astro";
+import { buildTaxonomyMap, getPosts } from "../../lib/content/posts";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return buildTaxonomyMap(posts, "categories").map((item) => ({
+    params: { category: item.name },
+    props: { item }
+  }));
+}
+
+const { item } = Astro.props;
+---
+
+<TaxonomyPage
+  item={item}
+  label="分类"
+  description="分类入口被保留下来，但它们不再定义首页和整站的主要叙事结构。"
+/>

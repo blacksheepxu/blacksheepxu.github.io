@@ -1,0 +1,40 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPostHref, type PostEntry } from "../../lib/content/posts";
+
+interface TaxonomyItem {
+  name: string;
+  items: PostEntry[];
+}
+
+interface Props {
+  item: TaxonomyItem;
+  label: string;
+  description: string;
+}
+
+const { item, label, description } = Astro.props;
+---
+
+<BaseLayout title={`${item.name} | ${label}`} description={`与 ${item.name} 相关的文章集合。`} path="/blog">
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h1>
+          {label}：{item.name}
+        </h1>
+        <p>{description}</p>
+      </div>
+    </div>
+    <div class="list-grid">
+      {item.items.map((post) => (
+        <article class="content-card">
+          <h3>
+            <a href={getPostHref(post)}>{post.data.title}</a>
+          </h3>
+          <p>{post.data.description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

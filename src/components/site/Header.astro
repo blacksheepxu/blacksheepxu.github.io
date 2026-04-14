@@ -1,0 +1,31 @@
+---
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  path: string;
+  nav: NavItem[];
+}
+
+const { path, nav } = Astro.props;
+---
+
+<header class="site-header shell">
+  <div class="site-header__inner">
+    <div class="site-title">
+      <a href="/">Blacksheep Research</a>
+    </div>
+    <nav class="site-nav" aria-label="站点导航">
+      {
+        nav.map((item) => (
+          <a href={item.href} aria-current={path === item.href ? "page" : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+

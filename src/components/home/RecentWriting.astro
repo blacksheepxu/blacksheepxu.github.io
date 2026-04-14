@@ -1,0 +1,24 @@
+---
+import { getPostHref, type PostEntry } from "../../lib/content/posts";
+
+interface Props {
+  posts: PostEntry[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="list-grid">
+  {posts.slice(0, 6).map((post) => (
+    <article class="content-card">
+      <h3>
+        <a href={getPostHref(post)}>{post.data.title}</a>
+      </h3>
+      <p>{post.data.description}</p>
+      <div class="meta-row">
+        <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+        {post.data.categories.slice(0, 1).map((category: string) => <span class="meta-chip">{category}</span>)}
+      </div>
+    </article>
+  ))}
+</div>

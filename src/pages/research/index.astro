@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ResearchCard from "../../components/research/ResearchCard.astro";
+import ResearchTimeline from "../../components/research/ResearchTimeline.astro";
+import { getPosts, getResearchEntries, type ResearchEntry } from "../../lib/content/posts";
+
+const [entries, posts] = await Promise.all([getResearchEntries(), getPosts()]);
+---
+
+<BaseLayout
+  title="研究 | Blacksheep Research"
+  description="研究方向、方法与代表成果在这里被整理成更适合长期查看的结构。"
+  path="/research"
+>
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h1>研究</h1>
+        <p>这里不是简单的文章列表，而是围绕方向、主题与成果组织的一层研究表达。</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      {entries.map((entry: ResearchEntry) => <ResearchCard entry={entry} />)}
+    </div>
+  </section>
+
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h2>最近的内容轨迹</h2>
+        <p>先用真实迁入的历史内容作为研究轨迹的起点，后续再让新内容继续接上。</p>
+      </div>
+    </div>
+    <ResearchTimeline posts={posts} />
+  </section>
+</BaseLayout>

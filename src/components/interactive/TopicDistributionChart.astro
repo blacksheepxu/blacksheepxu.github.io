@@ -1,0 +1,76 @@
+---
+interface Bucket {
+  label: string;
+  count: number;
+}
+
+interface Props {
+  buckets: Bucket[];
+}
+
+const { buckets } = Astro.props;
+const alpha = [...buckets].sort((left, right) => left.label.localeCompare(right.label, "zh-Hans-CN"));
+---
+
+<div class="stat-card" data-topic-root data-default={JSON.stringify(buckets)} data-alpha={JSON.stringify(alpha)}>
+  <div class="meta-row" style="margin-top: 0">
+    <button class="button" type="button" data-mode="default">按投入排序</button>
+    <button class="button" type="button" data-mode="alpha">按名称排序</button>
+  </div>
+  <div class="chart-bars" data-chart-bars></div>
+  <p data-chart-summary>主题分布用于看见内容重心，而不是评价哪条线“更值钱”。</p>
+</div>
+
+<script>
+  interface ChartItem {
+    label: string;
+    count: number;
+  }
+
+  const roots = document.querySelectorAll<HTMLElement>("[data-topic-root]");
+
+  const parseItems = (value: string | undefined): ChartItem[] => {
+    try {
+      return JSON.parse(value ?? "[]") as ChartItem[];
+    } catch {
+      return [];
+    }
+  };
+
+  roots.forEach((root) => {
+    const barHost = root.querySelector<HTMLElement>("[data-chart-bars]");
+    const summary = root.querySelector<HTMLElement>("[data-chart-summary]");
+
+    if (!barHost || !summary) {
+      return;
+    }
+
+    const defaultItems = parseItems(root.dataset.default);
+    const alphaItems = parseItems(root.dataset.alpha);
+
+    const render = (items: ChartItem[]) => {
+      const max = Math.max(...items.map((item) => item.count), 1);
+      barHost.innerHTML = items
+        .map(
+          (item) => `
+            <div class="chart-row">
+              <span>${item.label}</span>
+              <div class="chart-track"><i style="width:${(item.count / max) * 100}%"></i></div>
+              <strong>${item.count}</strong>
+            </div>
+          `
+        )
+        .join("");
+
+      summary.textContent = `当前共识别出 ${items.length} 个主题节点。`;
+    };
+
+    root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        render(button.dataset.mode === "alpha" ? alphaItems : defaultItems);
+      });
+    });
+
+    render(defaultItems);
+  });
+</script>

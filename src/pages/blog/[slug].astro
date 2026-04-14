@@ -1,0 +1,33 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getNativeStaticPaths, getPosts, type PostEntry } from "../../lib/content/posts";
+
+interface Props {
+  post: PostEntry;
+}
+
+export async function getStaticPaths() {
+  return getNativeStaticPaths(await getPosts());
+}
+
+const { post } = Astro.props as Props;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={`${post.data.title} | 博客`} description={post.data.description} path="/blog">
+  <article class="page-section panel prose">
+    <div class="section-head">
+      <div>
+        <h1>{post.data.title}</h1>
+        <p>{post.data.description}</p>
+      </div>
+    </div>
+    <div class="meta-row">
+      <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+      {post.data.categories.map((category: string) => <span class="meta-chip">{category}</span>)}
+      {post.data.tags.slice(0, 3).map((tag: string) => <span class="meta-chip">{tag}</span>)}
+    </div>
+    <Content />
+  </article>
+</BaseLayout>

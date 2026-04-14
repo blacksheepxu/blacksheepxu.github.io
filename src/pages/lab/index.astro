@@ -1,0 +1,35 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollectionSlug, getLabEntries, type LabEntry } from "../../lib/content/posts";
+
+const entries = await getLabEntries();
+---
+
+<BaseLayout
+  title="实验 | Blacksheep Research"
+  description="这里放的是轻量交互表达、统计视图和展示型 demo。"
+  path="/lab"
+>
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h1>实验页</h1>
+        <p>第一版只放能明显增强理解的小交互，而不是把这里做成一个复杂产品平台。</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      {entries.map((entry: LabEntry) => (
+        <article class="content-card">
+          <h3>
+            <a href={`/lab/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>
+          </h3>
+          <p>{entry.data.description}</p>
+          <div class="meta-row">
+            <span class="meta-chip">{entry.data.kind}</span>
+            <span class="meta-chip">{entry.data.status}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

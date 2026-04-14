@@ -1,0 +1,37 @@
+<div class="stat-card" data-parameter-shell>
+  <div class="meta-row" style="margin-top: 0">
+    <button class="button" type="button" data-panel="conclusion">结论</button>
+    <button class="button" type="button" data-panel="evidence">依据</button>
+    <button class="button" type="button" data-panel="next">下一步</button>
+  </div>
+  <div class="stack" style="margin-top: 1rem">
+    <div data-panel-content="conclusion">
+      <h3>为什么需要这种轻交互</h3>
+      <p>有些研究结果如果只写成长文，读者和未来的自己都很难快速抓住重点。</p>
+    </div>
+    <div data-panel-content="evidence" hidden>
+      <h3>它解决的问题</h3>
+      <p>图表、参数切换和结构化摘要可以把“我做了什么”和“结果意味着什么”拆开呈现。</p>
+    </div>
+    <div data-panel-content="next" hidden>
+      <h3>第一版的边界</h3>
+      <p>第一版只做能明显增强理解的小交互，不做带状态管理和业务逻辑的复杂应用。</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const shells = document.querySelectorAll<HTMLElement>("[data-parameter-shell]");
+
+  shells.forEach((shell) => {
+    const panels = shell.querySelectorAll<HTMLElement>("[data-panel-content]");
+
+    shell.querySelectorAll<HTMLButtonElement>("[data-panel]").forEach((button) => {
+      button.addEventListener("click", () => {
+        panels.forEach((panel) => {
+          panel.hidden = panel.dataset.panelContent !== button.dataset.panel;
+        });
+      });
+    });
+  });
+</script>

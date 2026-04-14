@@ -1,0 +1,49 @@
+---
+import "../styles/global.css";
+import Header from "../components/site/Header.astro";
+import Footer from "../components/site/Footer.astro";
+
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  path?: string;
+  nav?: NavItem[];
+}
+
+const {
+  title,
+  description = "一个为研究、表达与成果展示重建的 AI 个人网站。",
+  path = "/",
+  nav = [
+    { href: "/", label: "首页" },
+    { href: "/blog", label: "博客" },
+    { href: "/research", label: "研究" },
+    { href: "/lab", label: "实验" },
+    { href: "/about", label: "关于" }
+  ]
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <div class="site-frame">
+      <Header path={path} nav={nav} />
+      <main class="page-main shell">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

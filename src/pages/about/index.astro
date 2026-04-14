@@ -1,0 +1,25 @@
+---
+import { getEntry, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const about = await getEntry("site", "about");
+
+if (!about) {
+  throw new Error("Missing site/about content entry.");
+}
+
+const { Content } = await render(about);
+---
+
+<BaseLayout title="关于 | Blacksheep Research" description={about.data.description} path="/about">
+  <article class="page-section panel prose">
+    <div class="section-head">
+      <div>
+        <h1>{about.data.title}</h1>
+        <p>{about.data.description}</p>
+      </div>
+    </div>
+    <Content />
+  </article>
+</BaseLayout>
+

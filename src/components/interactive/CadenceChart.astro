@@ -1,0 +1,77 @@
+---
+interface Bucket {
+  label: string;
+  count: number;
+}
+
+interface Props {
+  buckets: Bucket[];
+}
+
+const { buckets } = Astro.props;
+const compact = buckets.slice(-6);
+---
+
+<div class="stat-card" data-cadence-root data-full={JSON.stringify(buckets)} data-compact={JSON.stringify(compact)}>
+  <div class="meta-row" style="margin-top: 0">
+    <button class="button" type="button" data-mode="compact">最近 6 个节点</button>
+    <button class="button" type="button" data-mode="full">全部</button>
+  </div>
+  <div class="chart-bars" data-chart-bars></div>
+  <p data-chart-summary>这里会显示近阶段内容记录节奏，帮助观察而不是催促更新。</p>
+</div>
+
+<script>
+  interface ChartItem {
+    label: string;
+    count: number;
+  }
+
+  const roots = document.querySelectorAll<HTMLElement>("[data-cadence-root]");
+
+  const parseItems = (value: string | undefined): ChartItem[] => {
+    try {
+      return JSON.parse(value ?? "[]") as ChartItem[];
+    } catch {
+      return [];
+    }
+  };
+
+  roots.forEach((root) => {
+    const barHost = root.querySelector<HTMLElement>("[data-chart-bars]");
+    const summary = root.querySelector<HTMLElement>("[data-chart-summary]");
+
+    if (!barHost || !summary) {
+      return;
+    }
+
+    const full = parseItems(root.dataset.full);
+    const compact = parseItems(root.dataset.compact);
+
+    const render = (items: ChartItem[]) => {
+      const max = Math.max(...items.map((item) => item.count), 1);
+      barHost.innerHTML = items
+        .map(
+          (item) => `
+            <div class="chart-row">
+              <span>${item.label}</span>
+              <div class="chart-track"><i style="width:${(item.count / max) * 100}%"></i></div>
+              <strong>${item.count}</strong>
+            </div>
+          `
+        )
+        .join("");
+
+      const total = items.reduce((sum, item) => sum + item.count, 0);
+      summary.textContent = `当前视图包含 ${items.length} 个时间节点，共 ${total} 篇内容。`;
+    };
+
+    root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        render(button.dataset.mode === "full" ? full : compact);
+      });
+    });
+
+    render(compact);
+  });
+</script>

@@ -1,0 +1,32 @@
+{
+  "name": "blacksheepxu-astro-lab",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "sync:legacy-content": "node scripts/extract-legacy-content.mjs",
+    "sync:legacy-assets": "node scripts/sync-legacy-assets.mjs",
+    "sync:legacy": "npm run sync:legacy-content && npm run sync:legacy-assets",
+    "predev": "npm run sync:legacy",
+    "prebuild": "npm run sync:legacy",
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/preact": "^4.0.0",
+    "astro": "^5.0.0",
+    "preact": "^10.26.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@playwright/test": "^1.55.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.1.0"
+  }
+}

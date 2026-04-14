@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollectionSlug, type ResearchEntry } from "../../lib/content/posts";
+
+interface Props {
+  entry: ResearchEntry;
+}
+
+export const getStaticPaths = (async () => {
+  const entries = await getCollection("research");
+  return entries.map((entry: ResearchEntry) => ({
+    params: { slug: getCollectionSlug(entry) },
+    props: { entry }
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props as Props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={`${entry.data.title} | 研究`} description={entry.data.description} path="/research">
+  <article class="page-section panel prose">
+    <div class="section-head">
+      <div>
+        <h1>{entry.data.title}</h1>
+        <p>{entry.data.description}</p>
+      </div>
+    </div>
+    <div class="meta-row">
+      <span class="meta-chip">{entry.data.focus}</span>
+      <span class="meta-chip">{entry.data.status}</span>
+    </div>
+    <Content />
+  </article>
+</BaseLayout>

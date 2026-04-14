@@ -1,0 +1,20 @@
+---
+import TaxonomyPage from "../../components/site/TaxonomyPage.astro";
+import { buildTaxonomyMap, getPosts } from "../../lib/content/posts";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return buildTaxonomyMap(posts, "tags").map((item) => ({
+    params: { tag: item.name },
+    props: { item }
+  }));
+}
+
+const { item } = Astro.props;
+---
+
+<TaxonomyPage
+  item={item}
+  label="标签"
+  description="标签页继续保留，但它们现在只是辅助发现入口，而不是整站的主组织方式。"
+/>

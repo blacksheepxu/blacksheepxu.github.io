@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/home/Hero.astro";
+import SectionShell from "../components/home/SectionShell.astro";
+import ResearchFocus from "../components/home/ResearchFocus.astro";
+import FeaturedContent from "../components/home/FeaturedContent.astro";
+import RecentWriting from "../components/home/RecentWriting.astro";
+import CadenceSummary from "../components/stats/CadenceSummary.astro";
+import TopicDistributionSummary from "../components/stats/TopicDistributionSummary.astro";
+import { getFeaturedPosts, getLabEntries, getPosts, getResearchEntries } from "../lib/content/posts";
+import { buildSiteStats } from "../lib/stats/site-stats";
+
+const [posts, researchEntries, labEntries, featuredPosts] = await Promise.all([
+  getPosts(),
+  getResearchEntries(),
+  getLabEntries(),
+  getFeaturedPosts()
+]);
+
+const stats = buildSiteStats(posts);
+---
+
+<BaseLayout
+  title="Blacksheep Research"
+  description="一个以博客、研究展示与轻量交互为核心的个人 AI 研究网站。"
+  path="/"
+>
+  <Hero totalPosts={stats.totalPosts} totalTopics={stats.totalTopics} totalYears={stats.totalLegacyYears} />
+
+  <SectionShell
+    title="研究方向"
+    description="首页先给出清晰的研究身份和方向，而不是让归档和标签决定整站叙事。"
+    linkHref="/research"
+    linkLabel="进入研究页"
+  >
+    <ResearchFocus entries={researchEntries} />
+  </SectionShell>
+
+  <SectionShell
+    title="代表内容与实验入口"
+    description="第一版先让文章、研究页和实验页形成一个轻量但完整的闭环。"
+    linkHref="/lab"
+    linkLabel="查看实验页"
+  >
+    <FeaturedContent posts={featuredPosts} labEntries={labEntries} />
+  </SectionShell>
+
+  <SectionShell
+    title="节奏与主题反馈"
+    description="统计只做温和的自我反馈：帮助观察最近是否留下痕迹，内容主要沉淀到了哪些方向。"
+  >
+    <div class="card-grid">
+      <CadenceSummary buckets={stats.cadence} />
+      <TopicDistributionSummary buckets={stats.topics} />
+    </div>
+  </SectionShell>
+
+  <SectionShell
+    title="近期写作"
+    description="历史内容会继续保留，但它们现在被纳入一个新的研究站结构里，而不是继续主导首页。"
+    linkHref="/blog"
+    linkLabel="浏览全部文章"
+  >
+    <RecentWriting posts={posts} />
+  </SectionShell>
+</BaseLayout>
+

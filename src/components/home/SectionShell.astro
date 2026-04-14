@@ -1,0 +1,26 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  linkHref?: string;
+  linkLabel?: string;
+}
+
+const { title, description, linkHref, linkLabel } = Astro.props;
+---
+
+<section class="page-section panel">
+  <div class="section-head">
+    <div>
+      <h2>{title}</h2>
+      <p>{description}</p>
+    </div>
+    {linkHref && linkLabel ? (
+      <a class="button" href={linkHref}>
+        {linkLabel}
+      </a>
+    ) : null}
+  </div>
+  <slot />
+</section>
+

@@ -1,0 +1,21 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollectionSlug } from "../../lib/content/posts";
+
+interface Props {
+  entry: CollectionEntry<"research">;
+}
+
+const { entry } = Astro.props;
+---
+
+<article class="content-card">
+  <h3>
+    <a href={`/research/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>
+  </h3>
+  <p>{entry.data.description}</p>
+  <div class="meta-row">
+    <span class="meta-chip">{entry.data.focus}</span>
+    <span class="meta-chip">{entry.data.status}</span>
+  </div>
+</article>

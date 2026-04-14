@@ -1,0 +1,22 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { siteMeta } from "../../data/site";
+import ResearchCard from "../research/ResearchCard.astro";
+
+interface Props {
+  entries: CollectionEntry<"research">[];
+}
+
+const { entries } = Astro.props;
+---
+
+<div class="card-grid">
+  <article class="content-card">
+    <h3>我希望这个站长期承载的内容</h3>
+    <ul>
+      {siteMeta.focusAreas.map((area) => <li>{area}</li>)}
+    </ul>
+  </article>
+  {entries.slice(0, 2).map((entry) => <ResearchCard entry={entry} />)}
+</div>
+

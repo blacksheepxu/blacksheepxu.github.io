@@ -1,0 +1,47 @@
+---
+import { siteMeta } from "../../data/site";
+
+interface Props {
+  totalPosts: number;
+  totalTopics: number;
+  totalYears: number;
+}
+
+const { totalPosts, totalTopics, totalYears } = Astro.props;
+---
+
+<section class="hero panel">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow">Personal AI Research Site</span>
+      <h1>用 Astro 重建一个更像研究基地、而不是旧博客归档的网站。</h1>
+      <p class="lede">{siteMeta.heroSummary}</p>
+      <div class="hero-actions">
+        <a class="button button--primary" href="/research">先看研究方向</a>
+        <a class="button" href="/blog">浏览历史文章</a>
+        <a class="button" href="/lab">进入实验页</a>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="metric-grid">
+        <div class="metric-card">
+          <strong>{totalPosts}</strong>
+          <span>已迁入的历史文章</span>
+        </div>
+        <div class="metric-card">
+          <strong>{totalTopics}</strong>
+          <span>可识别的研究主题</span>
+        </div>
+        <div class="metric-card">
+          <strong>{totalYears}</strong>
+          <span>累计内容年份跨度</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <h3>站点定位</h3>
+        <p>{siteMeta.tagline}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
