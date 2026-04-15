@@ -1,0 +1,59 @@
+---
+import ChannelHero from "./ChannelHero.astro";
+
+interface Chip {
+  label: string;
+  href?: string;
+}
+
+interface TrailItem {
+  label: string;
+  href?: string;
+}
+
+interface Metric {
+  label: string;
+  value: string | number;
+}
+
+interface Props {
+  title: string;
+  summary: string;
+  eyebrow: string;
+  pathTrail: TrailItem[];
+  chips?: Chip[];
+  metrics?: Metric[];
+  noteTitle?: string;
+  note?: string;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  summary,
+  eyebrow,
+  pathTrail,
+  chips = [],
+  metrics = [],
+  noteTitle = "Detail Note",
+  note,
+  bodyClass = "prose"
+} = Astro.props as Props;
+---
+
+<ChannelHero
+  pathTrail={pathTrail}
+  eyebrow={eyebrow}
+  title={title}
+  summary={summary}
+  chips={chips}
+  metrics={metrics}
+  noteTitle={noteTitle}
+  note={note}
+/>
+
+<article class="page-section panel">
+  <div class={bodyClass}>
+    <slot />
+  </div>
+</article>

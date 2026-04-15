@@ -10,12 +10,22 @@ const { entry } = Astro.props;
 ---
 
 <article class="content-card">
-  <h3>
+  <div class="archive-card__head">
+    <span class="card-kicker">Research Track</span>
+    <span class="meta-chip">{entry.data.status}</span>
+  </div>
+  <h3 class="archive-card__title">
     <a href={`/research/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>
   </h3>
-  <p>{entry.data.description}</p>
+  <p class="archive-card__summary">{entry.data.description}</p>
   <div class="meta-row">
     <span class="meta-chip">{entry.data.focus}</span>
-    <span class="meta-chip">{entry.data.status}</span>
+    <span class="meta-chip meta-chip--soft">{entry.data.featured ? "重点方向" : "持续跟进"}</span>
+  </div>
+  <div class="archive-card__footer">
+    <span class="archive-card__source">研究轨道</span>
+    <a class="archive-card__link" href={`/research/${getCollectionSlug(entry)}/`}>
+      查看方向
+    </a>
   </div>
 </article>

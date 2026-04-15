@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChannelHero from "./ChannelHero.astro";
 import { getPostHref, type PostEntry } from "../../lib/content/posts";
 
 interface TaxonomyItem {
@@ -14,25 +15,69 @@ interface Props {
 }
 
 const { item, label, description } = Astro.props;
+const newestPost = [...item.items].sort((left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime())[0];
+const legacyCount = item.items.filter((post) => post.data.source === "legacy").length;
 ---
 
 <BaseLayout title={`${item.name} | ${label}`} description={`与 ${item.name} 相关的文章集合。`} path="/blog">
+  <ChannelHero
+    pathTrail={[
+      { label: "博客", href: "/blog" },
+      { label: `${label}：${item.name}` }
+    ]}
+    eyebrow={label === "标签" ? "Topic Archive" : "Category Archive"}
+    title={`${label}：${item.name}`}
+    summary={description}
+    chips={[
+      { label: item.name },
+      { label: `${item.items.length} 篇文章` }
+    ]}
+    metrics={[
+      { label: "相关文章", value: item.items.length },
+      { label: "归档文章", value: legacyCount },
+      { label: "原生文章", value: item.items.length - legacyCount },
+      { label: "最近更新", value: newestPost?.data.pubDate.toISOString().slice(0, 10) ?? "-" }
+    ]}
+    noteTitle="Archive Note"
+    note="这里保留基于标签和分类的发现入口，但它们现在是辅助导航，而不是整站的主叙事框架。"
+  />
+
   <section class="page-section panel">
     <div class="section-head">
       <div>
-        <h1>
-          {label}：{item.name}
-        </h1>
-        <p>{description}</p>
+        <h2>相关内容</h2>
+        <p>继续从这个主题往下看，入口保持轻量，但信息足够完整。</p>
       </div>
     </div>
-    <div class="list-grid">
+    <div class="archive-grid">
       {item.items.map((post) => (
-        <article class="content-card">
-          <h3>
+        <article class="content-card archive-card">
+          <div class="archive-card__head">
+            <span class="card-kicker">{post.data.source === "legacy" ? "Legacy Entry" : "Native Note"}</span>
+            <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+          </div>
+          <h3 class="archive-card__title">
             <a href={getPostHref(post)}>{post.data.title}</a>
           </h3>
-          <p>{post.data.description}</p>
+          <p class="archive-card__summary">{post.data.description}</p>
+          <div class="meta-row">
+            {post.data.categories.slice(0, 2).map((category: string) => (
+              <a class="meta-chip" href={`/categories/${encodeURIComponent(category)}/`}>
+                {category}
+              </a>
+            ))}
+            {post.data.tags.slice(0, 2).map((tag: string) => (
+              <a class="meta-chip meta-chip--soft" href={`/tags/${encodeURIComponent(tag)}/`}>
+                #{tag}
+              </a>
+            ))}
+          </div>
+          <div class="archive-card__footer">
+            <span class="archive-card__source">{post.data.source === "legacy" ? "归档迁移" : "原生发布"}</span>
+            <a class="archive-card__link" href={getPostHref(post)}>
+              打开文章
+            </a>
+          </div>
         </article>
       ))}
     </div>

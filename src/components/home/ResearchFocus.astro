@@ -11,7 +11,8 @@ const { entries } = Astro.props;
 ---
 
 <div class="card-grid">
-  <article class="content-card">
+  <article class="content-card content-card--signal">
+    <span class="card-kicker">Core Tracks</span>
     <h3>我希望这个站长期承载的内容</h3>
     <ul>
       {siteMeta.focusAreas.map((area) => <li>{area}</li>)}
@@ -19,4 +20,3 @@ const { entries } = Astro.props;
   </article>
   {entries.slice(0, 2).map((entry) => <ResearchCard entry={entry} />)}
 </div>
-

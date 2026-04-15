@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryDetailShell from "../../components/site/EntryDetailShell.astro";
 import { getCollectionSlug, getPosts, type LabEntry } from "../../lib/content/posts";
 import { buildSiteStats } from "../../lib/stats/site-stats";
 import CadenceSummary from "../../components/stats/CadenceSummary.astro";
@@ -26,19 +27,29 @@ const stats = buildSiteStats(await getPosts());
 ---
 
 <BaseLayout title={`${entry.data.title} | 实验`} description={entry.data.description} path="/lab">
-  <article class="page-section panel prose">
-    <div class="section-head">
-      <div>
-        <h1>{entry.data.title}</h1>
-        <p>{entry.data.description}</p>
-      </div>
-    </div>
-    <div class="meta-row">
-      <span class="meta-chip">{entry.data.kind}</span>
-      <span class="meta-chip">{entry.data.status}</span>
-    </div>
+  <EntryDetailShell
+    title={entry.data.title}
+    summary={entry.data.description}
+    eyebrow="Lab Detail"
+    pathTrail={[
+      { label: "实验", href: "/lab" },
+      { label: entry.data.title }
+    ]}
+    chips={[
+      { label: entry.data.kind },
+      { label: entry.data.status }
+    ]}
+    metrics={[
+      { label: "实验类型", value: entry.data.kind },
+      { label: "当前状态", value: entry.data.status },
+      { label: "重点入口", value: entry.data.featured ? "是" : "否" },
+      { label: "内容来源", value: "交互表达" }
+    ]}
+    noteTitle="Lab Detail"
+    note="实验详情页既解释这个入口为什么存在，也保留必要的交互示例来帮助理解。"
+  >
     <Content />
-  </article>
+  </EntryDetailShell>
 
   <section class="page-section panel">
     <div class="section-head">

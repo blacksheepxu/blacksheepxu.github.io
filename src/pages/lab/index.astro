@@ -1,32 +1,62 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChannelHero from "../../components/site/ChannelHero.astro";
 import { getCollectionSlug, getLabEntries, type LabEntry } from "../../lib/content/posts";
+import { siteMeta } from "../../data/site";
 
 const entries = await getLabEntries();
+const readyCount = entries.filter((entry) => entry.data.status === "ready").length;
+const statsCount = entries.filter((entry) => entry.data.kind === "stats").length;
 ---
 
 <BaseLayout
-  title="实验 | Blacksheep Research"
+  title={`实验 | ${siteMeta.title}`}
   description="这里放的是轻量交互表达、统计视图和展示型 demo。"
   path="/lab"
 >
+  <ChannelHero
+    pathLabel="实验"
+    eyebrow="Interaction Layer"
+    title="实验"
+    summary="这里承载轻量交互、统计视图和展示型 demo，让某些研究结果不只停留在文字里。"
+    chips={entries.map((entry) => ({ label: entry.data.kind, href: `/lab/${getCollectionSlug(entry)}/` }))}
+    metrics={[
+      { label: "实验数量", value: entries.length },
+      { label: "可直接查看", value: readyCount },
+      { label: "统计视图", value: statsCount },
+      { label: "展示原型", value: entries.length - statsCount }
+    ]}
+    noteTitle="Lab Note"
+    note="实验页不是产品区，而是研究表达区。它的目标是更清楚地呈现结果，而不是制造复杂维护负担。"
+  />
+
   <section class="page-section panel">
     <div class="section-head">
       <div>
-        <h1>实验页</h1>
-        <p>第一版只放能明显增强理解的小交互，而不是把这里做成一个复杂产品平台。</p>
+        <h2>实验入口</h2>
+        <p>优先放那些确实适合用交互、图表或切换态来解释的内容。</p>
       </div>
     </div>
     <div class="card-grid">
       {entries.map((entry: LabEntry) => (
-        <article class="content-card">
-          <h3>
+        <article class="content-card content-card--signal">
+          <div class="archive-card__head">
+            <span class="card-kicker">Lab Entry</span>
+            <span class="meta-chip">{entry.data.status}</span>
+          </div>
+          <h3 class="archive-card__title">
             <a href={`/lab/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>
           </h3>
-          <p>{entry.data.description}</p>
+          <p class="archive-card__summary">{entry.data.description}</p>
           <div class="meta-row">
             <span class="meta-chip">{entry.data.kind}</span>
-            <span class="meta-chip">{entry.data.status}</span>
+            <span class="meta-chip meta-chip--soft">{entry.data.featured ? "重点入口" : "扩展入口"}</span>
+          </div>
+          <div class="archive-card__footer">
+            <span class="archive-card__source">交互表达</span>
+            <a class="archive-card__link" href={`/lab/${getCollectionSlug(entry)}/`}>
+              打开实验
+            </a>
           </div>
         </article>
       ))}

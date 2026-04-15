@@ -1,0 +1,81 @@
+---
+interface Chip {
+  label: string;
+  href?: string;
+}
+
+interface TrailItem {
+  label: string;
+  href?: string;
+}
+
+interface Metric {
+  label: string;
+  value: string | number;
+}
+
+interface Props {
+  pathLabel?: string;
+  pathTrail?: TrailItem[];
+  eyebrow: string;
+  title: string;
+  summary: string;
+  chips?: Chip[];
+  metrics?: Metric[];
+  noteTitle?: string;
+  note?: string;
+}
+
+const { pathLabel = "", pathTrail, eyebrow, title, summary, chips = [], metrics = [], noteTitle = "Channel Note", note } = Astro.props as Props;
+const trail = pathTrail ?? (pathLabel ? [{ label: pathLabel }] : []);
+---
+
+<section class="channel-hero panel">
+  <div class="channel-hero__grid">
+    <div class="channel-hero__copy">
+      <div class="article-path">
+        <a href="/">首页</a>
+        {trail.map((item) => (
+          <>
+            <span>/</span>
+            {item.href ? <a href={item.href}>{item.label}</a> : <span>{item.label}</span>}
+          </>
+        ))}
+      </div>
+      <span class="eyebrow eyebrow--muted">{eyebrow}</span>
+      <h1>{title}</h1>
+      <p class="channel-summary">{summary}</p>
+      {chips.length > 0 && (
+        <div class="article-taxonomy">
+          {chips.map((chip) =>
+            chip.href ? (
+              <a class="meta-chip" href={chip.href}>
+                {chip.label}
+              </a>
+            ) : (
+              <span class="meta-chip">{chip.label}</span>
+            )
+          )}
+        </div>
+      )}
+    </div>
+
+    {metrics.length > 0 && (
+      <aside class="channel-metrics">
+        {metrics.map((metric) => (
+          <div class="channel-metric">
+            <span>{metric.label}</span>
+            <strong>{metric.value}</strong>
+          </div>
+        ))}
+      </aside>
+    )}
+  </div>
+
+  {note && (
+    <div class="channel-note">
+      <span class="card-kicker">{noteTitle}</span>
+      <p>{note}</p>
+    </div>
+  )}
+</section>

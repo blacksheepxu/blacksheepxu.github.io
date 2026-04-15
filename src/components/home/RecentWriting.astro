@@ -11,6 +11,7 @@ const { posts } = Astro.props;
 <div class="list-grid">
   {posts.slice(0, 6).map((post) => (
     <article class="content-card">
+      <span class="card-kicker">Recent Writing</span>
       <h3>
         <a href={getPostHref(post)}>{post.data.title}</a>
       </h3>

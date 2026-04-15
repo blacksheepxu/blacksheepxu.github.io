@@ -9,18 +9,26 @@ const { posts } = Astro.props;
 const milestones = posts.slice(0, 5);
 ---
 
-<div class="stack">
+<div class="stack timeline-stack">
   {milestones.map((post) => (
-    <article class="content-card">
-      <h3>
+    <article class="content-card timeline-card">
+      <div class="archive-card__head">
+        <span class="card-kicker">Milestone</span>
+        <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+      </div>
+      <h3 class="archive-card__title">
         <a href={getPostHref(post)}>{post.data.title}</a>
       </h3>
-      <p>{post.data.description}</p>
+      <p class="archive-card__summary">{post.data.description}</p>
       <div class="meta-row">
-        <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
         <span class="meta-chip">{post.data.topic ?? "研究笔记"}</span>
+      </div>
+      <div class="archive-card__footer">
+        <span class="archive-card__source">内容轨迹</span>
+        <a class="archive-card__link" href={getPostHref(post)}>
+          继续阅读
+        </a>
       </div>
     </article>
   ))}
 </div>
-

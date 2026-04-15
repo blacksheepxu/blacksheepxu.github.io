@@ -20,7 +20,10 @@
     "@astrojs/mdx": "^4.0.0",
     "@astrojs/preact": "^4.0.0",
     "astro": "^5.0.0",
+    "katex": "^0.16.45",
     "preact": "^10.26.0",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
     "zod": "^3.24.0"
   },
   "devDependencies": {

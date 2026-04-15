@@ -1,34 +1,107 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getPostHref, getPosts, type PostEntry } from "../../lib/content/posts";
+import { buildTaxonomyMap, getPostHref, getPosts, isLegacyPost, type PostEntry } from "../../lib/content/posts";
+import { siteMeta } from "../../data/site";
 
 const posts = await getPosts();
+const nativeCount = posts.filter((post) => !isLegacyPost(post)).length;
+const legacyCount = posts.length - nativeCount;
+const categories = buildTaxonomyMap(posts, "categories");
+const topicCount = categories.length;
+const highlightedCategories = [...categories]
+  .sort((left, right) => right.items.length - left.items.length)
+  .slice(0, 4);
 ---
 
 <BaseLayout
-  title="博客 | Blacksheep Research"
-  description="迁入 Astro 后的博客入口，保留旧文，同时让内容重新回到研究语境里。"
+  title={`博客 | ${siteMeta.title}`}
+  description="博客与研究笔记入口。"
   path="/blog"
 >
+  <section class="archive-hero panel">
+    <div class="archive-hero__grid">
+      <div class="archive-hero__copy">
+        <div class="article-path">
+          <a href="/">首页</a>
+          <span>/</span>
+          <span>博客</span>
+        </div>
+        <span class="eyebrow eyebrow--muted">Writing Archive</span>
+        <h1>博客</h1>
+        <p class="archive-summary">
+          旧文章保留，新笔记继续生长。这里更像研究目录，而不是按年月堆叠的归档页。
+        </p>
+        <div class="article-taxonomy">
+          {highlightedCategories.map(({ name }) => (
+            <a class="meta-chip" href={`/categories/${encodeURIComponent(name)}/`}>
+              {name}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <aside class="archive-specs">
+        <div class="archive-metric">
+          <span>文章总数</span>
+          <strong>{posts.length}</strong>
+        </div>
+        <div class="archive-metric">
+          <span>原生内容</span>
+          <strong>{nativeCount}</strong>
+        </div>
+        <div class="archive-metric">
+          <span>归档内容</span>
+          <strong>{legacyCount}</strong>
+        </div>
+        <div class="archive-metric">
+          <span>主题分类</span>
+          <strong>{topicCount}</strong>
+        </div>
+      </aside>
+    </div>
+
+    <div class="archive-signal">
+      <span class="card-kicker">Archive Note</span>
+      <p>博客页负责收纳完整写作资产；真正的主入口仍然是首页、研究页和实验页。</p>
+    </div>
+  </section>
+
   <section class="page-section panel">
     <div class="section-head">
       <div>
-        <h1>博客</h1>
-        <p>这里保留旧文章，也会承载之后的新研究笔记与内容发布。</p>
+        <h2>全部文章</h2>
+        <p>按时间排序浏览，也可以从分类和标签继续进入具体主题。</p>
       </div>
     </div>
-    <div class="list-grid">
+
+    <div class="archive-grid">
       {posts.map((post: PostEntry) => (
-        <article class="content-card">
-          <h3>
+        <article class={`content-card archive-card ${isLegacyPost(post) ? "archive-card--legacy" : "archive-card--native"}`}>
+          <div class="archive-card__head">
+            <span class="card-kicker">{isLegacyPost(post) ? "Legacy Entry" : "Native Note"}</span>
+            <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+          </div>
+          <h3 class="archive-card__title">
             <a href={getPostHref(post)}>{post.data.title}</a>
           </h3>
-          <p>{post.data.description}</p>
+          <p class="archive-card__summary">{post.data.description}</p>
           <div class="meta-row">
-            <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
             {(post.data.categories.length ? post.data.categories : ["未分类"]).slice(0, 2).map((item: string) => (
-              <span class="meta-chip">{item}</span>
+              <a class="meta-chip" href={`/categories/${encodeURIComponent(item)}/`}>
+                {item}
+              </a>
             ))}
+            {post.data.tags.slice(0, 2).map((item: string) => (
+              <a class="meta-chip meta-chip--soft" href={`/tags/${encodeURIComponent(item)}/`}>
+                #{item}
+              </a>
+            ))}
+          </div>
+          <div class="archive-card__footer">
+            <span class="archive-card__source">{isLegacyPost(post) ? "归档迁移" : "原生发布"}</span>
+            <a class="archive-card__link" href={getPostHref(post)}>
+              打开文章
+            </a>
           </div>
         </article>
       ))}

@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryDetailShell from "../../components/site/EntryDetailShell.astro";
 import { getCollectionSlug, type ResearchEntry } from "../../lib/content/posts";
 
 interface Props {
@@ -21,17 +22,27 @@ const { Content } = await render(entry);
 ---
 
 <BaseLayout title={`${entry.data.title} | 研究`} description={entry.data.description} path="/research">
-  <article class="page-section panel prose">
-    <div class="section-head">
-      <div>
-        <h1>{entry.data.title}</h1>
-        <p>{entry.data.description}</p>
-      </div>
-    </div>
-    <div class="meta-row">
-      <span class="meta-chip">{entry.data.focus}</span>
-      <span class="meta-chip">{entry.data.status}</span>
-    </div>
+  <EntryDetailShell
+    title={entry.data.title}
+    summary={entry.data.description}
+    eyebrow="Research Detail"
+    pathTrail={[
+      { label: "研究", href: "/research" },
+      { label: entry.data.title }
+    ]}
+    chips={[
+      { label: entry.data.focus },
+      { label: entry.data.status }
+    ]}
+    metrics={[
+      { label: "研究焦点", value: entry.data.focus },
+      { label: "当前状态", value: entry.data.status },
+      { label: "关联文章", value: entry.data.relatedPosts.length },
+      { label: "显示优先级", value: entry.data.order }
+    ]}
+    noteTitle="Research Detail"
+    note="研究详情页负责更完整地解释一个方向，而不是只留下卡片级摘要。"
+  >
     <Content />
-  </article>
+  </EntryDetailShell>
 </BaseLayout>

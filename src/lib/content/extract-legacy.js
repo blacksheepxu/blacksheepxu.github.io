@@ -1,11 +1,15 @@
-function decodeEntities(input) {
-  return input
-    .replace(/&#x2F;/g, "/")
+function decodeEntities(input, { trim = true } = {}) {
+  const decoded = input
+    .replace(/&#x([0-9a-f]+);/gi, (_, value) => String.fromCodePoint(parseInt(value, 16)))
+    .replace(/&#(\d+);/g, (_, value) => String.fromCodePoint(parseInt(value, 10)))
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .trim();
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'");
+
+  return trim ? decoded.trim() : decoded;
 }
 
 function ensureTagMatches(block, tagName) {
@@ -47,15 +51,48 @@ function inferTopic(categories, tags) {
   return categories[0] ?? tags[0] ?? "未分类研究";
 }
 
+function decodeCodeBlock(codeHtml) {
+  return decodeEntities(
+    codeHtml
+      .replace(/<\/span>/gi, "")
+      .replace(/<span[^>]*>/gi, "")
+      .replace(/<br\s*\/?>/gi, "\n"),
+    { trim: false }
+  )
+    .replace(/\r\n/g, "\n")
+    .replace(/\n+$/g, "");
+}
+
+function normalizeLegacyCodeBlocks(html) {
+  return html.replace(/<figure class="([^"]*\bhighlight\b[^"]*)">([\s\S]*?)<\/figure>/gi, (figure, className, innerHtml) => {
+    const classTokens = className.split(/\s+/).filter(Boolean);
+    const language = classTokens.find((token) => token !== "highlight") ?? "text";
+    const codeMatch = innerHtml.match(/<td class="code">\s*<pre>([\s\S]*?)<\/pre>\s*<\/td>/i);
+
+    if (!codeMatch) {
+      return figure;
+    }
+
+    const code = decodeCodeBlock(codeMatch[1] ?? "");
+    return `\n\n\`\`\`${language}\n${code}\n\`\`\`\n\n`;
+  });
+}
+
 function normalizeBody(html) {
-  return html
+  const normalizedHtml = html
     .replace(/<a id="more"><\/a>/g, "")
+    .replace(/<br\s*\/?>/gi, "<br />")
+    .replace(/<hr\s*\/?>/gi, "<hr />")
     .replace(/<script[^>]*type="math\/tex[^"]*"[^>]*>([\s\S]*?)<\/script>/gi, '<pre class="legacy-math"><code>$1</code></pre>')
     .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<br>/g, "<br />")
-    .replace(/<hr>/g, "<hr />")
-    .replace(/\{/g, "&#123;")
-    .replace(/\}/g, "&#125;");
+    .replace(/<pre class="legacy-math"><code>([\s\S]*?)<\/code><\/pre>/gi, (_, math) => {
+      return `<pre class="legacy-math"><code>${decodeEntities(math, { trim: false })}</code></pre>`;
+    })
+    .replace(/<div class="table-container">([\s\S]*?)<\/div>/gi, "$1")
+    .replace(/\r\n/g, "\n")
+    .trim();
+
+  return normalizeLegacyCodeBlocks(normalizedHtml).trim();
 }
 
 function capture(block, pattern) {

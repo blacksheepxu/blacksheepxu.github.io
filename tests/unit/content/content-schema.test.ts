@@ -4,7 +4,8 @@ import { siteMeta } from "../../../src/data/site";
 
 describe("site meta", () => {
   it("defines the high-level research site framing", () => {
-    expect(siteMeta.title).toContain("Research");
+    expect(siteMeta.title).toBe("Blacksheep");
+    expect(siteMeta.description).toContain("博客");
     expect(siteMeta.focusAreas.length).toBeGreaterThanOrEqual(3);
   });
 });

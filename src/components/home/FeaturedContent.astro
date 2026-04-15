@@ -13,6 +13,7 @@ const { posts, labEntries } = Astro.props;
 <div class="card-grid">
   {posts.slice(0, 2).map((post) => (
     <article class="content-card">
+      <span class="card-kicker">Featured Post</span>
       <h3>
         <a href={getPostHref(post)}>{post.data.title}</a>
       </h3>
@@ -24,7 +25,8 @@ const { posts, labEntries } = Astro.props;
     </article>
   ))}
   {labEntries.slice(0, 1).map((entry) => (
-    <article class="content-card">
+    <article class="content-card content-card--accent">
+      <span class="card-kicker">Interactive</span>
       <h3>
         <a href={`/lab/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>
       </h3>

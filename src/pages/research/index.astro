@@ -1,22 +1,42 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChannelHero from "../../components/site/ChannelHero.astro";
 import ResearchCard from "../../components/research/ResearchCard.astro";
 import ResearchTimeline from "../../components/research/ResearchTimeline.astro";
-import { getPosts, getResearchEntries, type ResearchEntry } from "../../lib/content/posts";
+import { buildTaxonomyMap, getCollectionSlug, getPosts, getResearchEntries, type ResearchEntry } from "../../lib/content/posts";
+import { siteMeta } from "../../data/site";
 
 const [entries, posts] = await Promise.all([getResearchEntries(), getPosts()]);
+const activeEntries = entries.filter((entry) => entry.data.status === "active").length;
+const topicCount = buildTaxonomyMap(posts, "categories").length;
 ---
 
 <BaseLayout
-  title="研究 | Blacksheep Research"
-  description="研究方向、方法与代表成果在这里被整理成更适合长期查看的结构。"
+  title={`研究 | ${siteMeta.title}`}
+  description="研究方向、方法和代表内容。"
   path="/research"
 >
+  <ChannelHero
+    pathLabel="研究"
+    eyebrow="Research Modes"
+    title="研究"
+    summary="按方向、方法和代表内容整理研究资产，让重点问题、长期主题和最近轨迹在同一页里对齐。"
+    chips={entries.map((entry) => ({ label: entry.data.focus, href: `/research/${getCollectionSlug(entry)}/` }))}
+    metrics={[
+      { label: "研究轨道", value: entries.length },
+      { label: "活跃方向", value: activeEntries },
+      { label: "相关文章", value: posts.length },
+      { label: "主题分类", value: topicCount }
+    ]}
+    noteTitle="Research Note"
+    note="研究页负责定义你在长期关注什么，以及这些方向是如何通过文章和实验继续扩展的。"
+  />
+
   <section class="page-section panel">
     <div class="section-head">
       <div>
-        <h1>研究</h1>
-        <p>这里不是简单的文章列表，而是围绕方向、主题与成果组织的一层研究表达。</p>
+        <h2>研究版图</h2>
+        <p>每一条研究轨道都尽量说明主题、当前状态和继续展开的入口。</p>
       </div>
     </div>
     <div class="card-grid">
@@ -28,7 +48,7 @@ const [entries, posts] = await Promise.all([getResearchEntries(), getPosts()]);
     <div class="section-head">
       <div>
         <h2>最近的内容轨迹</h2>
-        <p>先用真实迁入的历史内容作为研究轨迹的起点，后续再让新内容继续接上。</p>
+        <p>按时间查看研究内容如何继续增长，而不是只看单次输出。</p>
       </div>
     </div>
     <ResearchTimeline posts={posts} />

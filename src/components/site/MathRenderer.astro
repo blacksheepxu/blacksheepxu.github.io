@@ -1,0 +1,52 @@
+<script>
+  import katex from "katex";
+  import renderMathInElement from "katex/contrib/auto-render";
+
+  function renderLegacyMath(root: HTMLElement) {
+    root.querySelectorAll("pre.legacy-math").forEach((block: Element) => {
+      if (!(block instanceof HTMLElement)) {
+        return;
+      }
+
+      const source = block.textContent?.trim();
+
+      if (!source || block.dataset.mathRendered === "true") {
+        return;
+      }
+
+      block.dataset.mathRendered = "true";
+      block.innerHTML = katex.renderToString(source, {
+        displayMode: true,
+        throwOnError: false
+      });
+    });
+  }
+
+  function renderMath(root: HTMLElement) {
+    renderLegacyMath(root);
+    renderMathInElement(root, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "\\[", right: "\\]", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      throwOnError: false,
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll(".prose").forEach((node) => {
+      if (node instanceof HTMLElement) {
+        renderMath(node);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
+</script>

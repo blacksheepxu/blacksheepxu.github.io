@@ -1,8 +1,12 @@
 ---
 import { getEntry, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChannelHero from "../../components/site/ChannelHero.astro";
+import { getLabEntries, getPosts, getResearchEntries } from "../../lib/content/posts";
+import { siteMeta } from "../../data/site";
 
 const about = await getEntry("site", "about");
+const [posts, researchEntries, labEntries] = await Promise.all([getPosts(), getResearchEntries(), getLabEntries()]);
 
 if (!about) {
   throw new Error("Missing site/about content entry.");
@@ -11,15 +15,64 @@ if (!about) {
 const { Content } = await render(about);
 ---
 
-<BaseLayout title="关于 | Blacksheep Research" description={about.data.description} path="/about">
-  <article class="page-section panel prose">
-    <div class="section-head">
-      <div>
-        <h1>{about.data.title}</h1>
-        <p>{about.data.description}</p>
-      </div>
-    </div>
-    <Content />
-  </article>
-</BaseLayout>
+<BaseLayout title={`关于 | ${siteMeta.title}`} description={about.data.description} path="/about">
+  <ChannelHero
+    pathLabel="关于"
+    eyebrow="Site Context"
+    title={about.data.title}
+    summary={about.data.description}
+    chips={[
+      { label: "博客", href: "/blog" },
+      { label: "研究", href: "/research" },
+      { label: "实验", href: "/lab" }
+    ]}
+    metrics={[
+      { label: "历史文章", value: posts.length },
+      { label: "研究入口", value: researchEntries.length },
+      { label: "实验入口", value: labEntries.length },
+      { label: "起始年份", value: 2019 }
+    ]}
+    noteTitle="About Note"
+    note="关于页负责解释这个站为什么存在、它如何使用，以及它更在意什么。"
+  />
 
+  <section class="about-grid">
+    <article class="page-section panel">
+      <div class="section-head">
+        <div>
+          <h2>站点说明</h2>
+          <p>这部分保留更完整的自述，作为整个研究站的背景说明。</p>
+        </div>
+      </div>
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+
+    <aside class="page-section panel">
+      <div class="section-head">
+        <div>
+          <h2>站点结构</h2>
+          <p>三条内容线各自承担不同角色，但都服务于同一个长期使用目标。</p>
+        </div>
+      </div>
+      <div class="stack">
+        <article class="content-card">
+          <span class="card-kicker">Blog</span>
+          <h3>写作与积累</h3>
+          <p>保留历史文章，也接纳新的研究笔记和方法记录。</p>
+        </article>
+        <article class="content-card content-card--signal">
+          <span class="card-kicker">Research</span>
+          <h3>主题与方向</h3>
+          <p>把长期研究方向、代表内容和最近轨迹组织得更清楚。</p>
+        </article>
+        <article class="content-card content-card--accent">
+          <span class="card-kicker">Lab</span>
+          <h3>交互与展示</h3>
+          <p>承载适合用图表、参数切换或轻交互来表达的研究结果。</p>
+        </article>
+      </div>
+    </aside>
+  </section>
+</BaseLayout>

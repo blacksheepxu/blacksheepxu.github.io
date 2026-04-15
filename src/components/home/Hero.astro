@@ -13,13 +13,13 @@ const { totalPosts, totalTopics, totalYears } = Astro.props;
 <section class="hero panel">
   <div class="hero-grid">
     <div class="hero-copy">
-      <span class="eyebrow">Personal AI Research Site</span>
-      <h1>用 Astro 重建一个更像研究基地、而不是旧博客归档的网站。</h1>
+      <span class="eyebrow">Research / Writing / Experiments</span>
+      <h1>把研究、写作和实验放在同一个站里。</h1>
       <p class="lede">{siteMeta.heroSummary}</p>
       <div class="hero-actions">
-        <a class="button button--primary" href="/research">先看研究方向</a>
-        <a class="button" href="/blog">浏览历史文章</a>
-        <a class="button" href="/lab">进入实验页</a>
+        <a class="button button--primary" href="/research">看研究</a>
+        <a class="button" href="/blog">看文章</a>
+        <a class="button" href="/lab">看实验</a>
       </div>
     </div>
     <div class="stack">
@@ -37,11 +37,20 @@ const { totalPosts, totalTopics, totalYears } = Astro.props;
           <span>累计内容年份跨度</span>
         </div>
       </div>
-      <div class="stat-card">
-        <h3>站点定位</h3>
-        <p>{siteMeta.tagline}</p>
+      <div class="stat-card system-card">
+        <div class="system-card__head">
+          <span class="eyebrow eyebrow--muted">System Focus</span>
+          <h3>{siteMeta.tagline}</h3>
+        </div>
+        <ul class="signal-list">
+          {siteMeta.focusAreas.map((area) => (
+            <li>
+              <span class="signal-list__index">0{siteMeta.focusAreas.indexOf(area) + 1}</span>
+              <span>{area}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   </div>
 </section>
-

@@ -1,0 +1,83 @@
+---
+import { isLegacyPost, type PostEntry } from "../../lib/content/posts";
+
+interface Props {
+  post: PostEntry;
+}
+
+const { post } = Astro.props as Props;
+
+const sourceLabel = isLegacyPost(post) ? "归档文章" : "原生文章";
+const sourceDescription = isLegacyPost(post) ? "从旧站迁移并重新整理" : "在 Astro 中原生发布";
+const readingMinutes = Math.max(
+  1,
+  Math.round(
+    post.body
+      .replace(/<[^>]+>/g, " ")
+      .replace(/[`#>*_\-\n\r]/g, " ")
+      .trim()
+      .length / 420
+  )
+);
+const topic = post.data.topic || post.data.categories[0] || "研究记录";
+---
+
+<article class="article-shell">
+  <div class="article-hero panel">
+    <div class="article-hero__grid">
+      <div class="article-hero__copy">
+        <div class="article-path">
+          <a href="/blog">博客</a>
+          <span>/</span>
+          <span>{sourceLabel}</span>
+        </div>
+        <span class="eyebrow eyebrow--muted">{topic}</span>
+        <h1>{post.data.title}</h1>
+        <p class="article-summary">{post.data.description}</p>
+      </div>
+
+      <aside class="article-specs">
+        <div class="article-specs__head">
+          <span class="card-kicker">Article Brief</span>
+          <p>{sourceDescription}</p>
+        </div>
+
+        <dl class="article-spec-list">
+          <div class="article-spec">
+            <dt>发布日期</dt>
+            <dd>{post.data.pubDate.toISOString().slice(0, 10)}</dd>
+          </div>
+          <div class="article-spec">
+            <dt>阅读时长</dt>
+            <dd>{readingMinutes} 分钟</dd>
+          </div>
+          <div class="article-spec">
+            <dt>内容来源</dt>
+            <dd>{sourceLabel}</dd>
+          </div>
+          <div class="article-spec">
+            <dt>研究主题</dt>
+            <dd>{topic}</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+
+    <div class="article-taxonomy">
+      {post.data.categories.map((category: string) => (
+        <a class="meta-chip" href={`/categories/${encodeURIComponent(category)}/`}>
+          {category}
+        </a>
+      ))}
+      {post.data.tags.map((tag: string) => (
+        <a class="meta-chip meta-chip--soft" href={`/tags/${encodeURIComponent(tag)}/`}>
+          #{tag}
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <div class="article-body panel">
+    <slot />
+  </div>
+</article>

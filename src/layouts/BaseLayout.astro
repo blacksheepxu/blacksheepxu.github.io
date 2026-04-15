@@ -1,7 +1,10 @@
 ---
 import "../styles/global.css";
+import "katex/dist/katex.min.css";
 import Header from "../components/site/Header.astro";
 import Footer from "../components/site/Footer.astro";
+import MathRenderer from "../components/site/MathRenderer.astro";
+import { siteMeta } from "../data/site";
 
 interface NavItem {
   href: string;
@@ -17,7 +20,7 @@ interface Props {
 
 const {
   title,
-  description = "一个为研究、表达与成果展示重建的 AI 个人网站。",
+  description = siteMeta.description,
   path = "/",
   nav = [
     { href: "/", label: "首页" },
@@ -45,5 +48,6 @@ const {
       </main>
       <Footer />
     </div>
+    <MathRenderer />
   </body>
 </html>

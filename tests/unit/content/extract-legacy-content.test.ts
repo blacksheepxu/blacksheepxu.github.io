@@ -54,6 +54,25 @@ describe("parseLegacyEntries", () => {
 </search>`;
 
     const [entry] = parseLegacyEntries(mathXml);
-    expect(entry?.body).toContain('<pre class="legacy-math"><code>\\mathcal&#123;L&#125;</code></pre>');
+    expect(entry?.body).toContain('<pre class="legacy-math"><code>\\mathcal{L}</code></pre>');
+  });
+
+  it("converts legacy Hexo highlight blocks into fenced code blocks", () => {
+    const codeXml = `<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>代码文章</title>
+    <url>/2020/02/01/code/</url>
+    <content><![CDATA[<p>示例</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br /><span class="line">2</span><br /></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br /><span class="line">config = &#123;<span class="string">"x"</span>: <span class="number">1</span>&#125;</span><br /></pre></td></tr></table></figure>]]></content>
+    <categories><category>Pytorch</category></categories>
+    <tags><tag>code</tag></tags>
+  </entry>
+</search>`;
+
+    const [entry] = parseLegacyEntries(codeXml);
+    expect(entry?.body).toContain("```python");
+    expect(entry?.body).toContain('import torch');
+    expect(entry?.body).toContain('config = {"x": 1}');
+    expect(entry?.body).not.toContain('<figure class="highlight python">');
   });
 });

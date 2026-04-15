@@ -1,0 +1,100 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { Code } from "astro/components";
+import { siteMeta } from "../../data/site";
+
+const blogTemplate = `---
+title: 新文章标题
+description: 一句话简介
+pubDate: 2026-04-14
+categories: ["研究"]
+tags: ["astro"]
+source: "native"
+---`;
+
+const researchTemplate = `---
+title: 研究主题
+description: 主题说明
+focus: 研究地图
+status: active
+featured: true
+order: 1
+---`;
+
+const labTemplate = `---
+title: 实验标题
+description: 实验说明
+kind: demo
+status: prototype
+featured: false
+order: 10
+---`;
+---
+
+<BaseLayout title={`更新 | ${siteMeta.title}`} description="新增博客、研究页和实验页的入口。" path="/update">
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h1>更新</h1>
+        <p>新增内容时，先决定它属于博客、研究还是实验。</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <article class="content-card">
+        <h3>博客</h3>
+        <p>适合研究笔记、文章和阶段性总结。</p>
+        <div class="meta-row">
+          <span class="meta-chip">src/content/posts/</span>
+          <span class="meta-chip">.md / .mdx</span>
+        </div>
+        <Code code={blogTemplate} lang="yaml" theme="github-light" />
+      </article>
+
+      <article class="content-card">
+        <h3>研究</h3>
+        <p>适合整理一个方向、专题或阶段性版图。</p>
+        <div class="meta-row">
+          <span class="meta-chip">src/content/research/</span>
+          <span class="meta-chip">.mdx</span>
+        </div>
+        <Code code={researchTemplate} lang="yaml" theme="github-light" />
+      </article>
+
+      <article class="content-card">
+        <h3>实验</h3>
+        <p>适合图表、小工具和展示型 demo。</p>
+        <div class="meta-row">
+          <span class="meta-chip">src/content/lab/</span>
+          <span class="meta-chip">.mdx</span>
+        </div>
+        <Code code={labTemplate} lang="yaml" theme="github-light" />
+      </article>
+    </div>
+  </section>
+
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h2>补充入口</h2>
+        <p>常用修改点和本地命令。</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <article class="content-card">
+        <h3>关于页</h3>
+        <p>`src/content/site/about.md`</p>
+      </article>
+      <article class="content-card">
+        <h3>首页文案</h3>
+        <p>`src/data/site.ts` 和 `src/pages/index.astro`</p>
+      </article>
+      <article class="content-card">
+        <h3>本地预览</h3>
+        <Code code="npm run dev" lang="bash" theme="github-light" />
+        <p>保存后会自动刷新。</p>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
