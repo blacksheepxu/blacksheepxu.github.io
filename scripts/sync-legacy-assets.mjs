@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
+const sourceRoot = path.join(root, "legacy-source");
 const publicDir = path.join(root, "public");
 
 function isYearDirectory(name) {
@@ -37,14 +38,14 @@ async function copyAssetTree(sourceDir, targetDir) {
 }
 
 async function main() {
-  const rootEntries = await fs.readdir(root, { withFileTypes: true });
+  const rootEntries = await fs.readdir(sourceRoot, { withFileTypes: true });
   const yearDirectories = rootEntries.filter((entry) => entry.isDirectory() && isYearDirectory(entry.name));
 
   await Promise.all(
     yearDirectories.map(async (entry) => {
       const targetDir = path.join(publicDir, entry.name);
       await fs.rm(targetDir, { recursive: true, force: true });
-      await copyAssetTree(path.join(root, entry.name), targetDir);
+      await copyAssetTree(path.join(sourceRoot, entry.name), targetDir);
     })
   );
 
