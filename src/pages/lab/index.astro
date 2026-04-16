@@ -2,11 +2,15 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ChannelHero from "../../components/site/ChannelHero.astro";
 import { getCollectionSlug, getLabEntries, type LabEntry } from "../../lib/content/posts";
+import { getSectorGraph } from "../../lib/theme-sectors/get-sector-graph";
+import { getCarrierSectors } from "../../lib/theme-sectors/sector-presenters";
 import { siteMeta } from "../../data/site";
 
 const entries = await getLabEntries();
 const readyCount = entries.filter((entry) => entry.data.status === "ready").length;
 const statsCount = entries.filter((entry) => entry.data.kind === "stats").length;
+const sectorGraph = await getSectorGraph();
+const carrierSectors = getCarrierSectors(sectorGraph.sectors, "lab");
 ---
 
 <BaseLayout
@@ -18,8 +22,11 @@ const statsCount = entries.filter((entry) => entry.data.kind === "stats").length
     pathLabel="实验"
     eyebrow="Interaction Layer"
     title="实验"
-    summary="这里承载轻量交互、统计视图和展示型 demo，让某些研究结果不只停留在文字里。"
-    chips={entries.map((entry) => ({ label: entry.data.kind, href: `/lab/${getCollectionSlug(entry)}/` }))}
+    summary="这里是主题战区下的实验资产载体，用来承接图表、交互表达和展示型验证入口。"
+    chips={[
+      ...carrierSectors.map((sector) => ({ label: sector.title, href: `/sectors/${sector.slug}/` })),
+      ...entries.map((entry) => ({ label: entry.data.kind, href: `/lab/${getCollectionSlug(entry)}/` }))
+    ]}
     metrics={[
       { label: "实验数量", value: entries.length },
       { label: "可直接查看", value: readyCount },
@@ -27,7 +34,7 @@ const statsCount = entries.filter((entry) => entry.data.kind === "stats").length
       { label: "展示原型", value: entries.length - statsCount }
     ]}
     noteTitle="Lab Note"
-    note="实验页不是产品区，而是研究表达区。它的目标是更清楚地呈现结果，而不是制造复杂维护负担。"
+    note="实验页现在服务于战区表达：它不是独立产品区，而是帮助某个主题战区把结果、节奏和验证方式展示得更清楚。"
   />
 
   <section class="page-section panel">

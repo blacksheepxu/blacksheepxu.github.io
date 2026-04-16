@@ -1,14 +1,17 @@
 ---
 import { isLegacyPost, type PostEntry } from "../../lib/content/posts";
+import type { ThemeSector } from "../../lib/theme-sectors/sector-graph";
 
 interface Props {
   post: PostEntry;
+  relatedSectors?: ThemeSector[];
 }
 
-const { post } = Astro.props as Props;
+const { post, relatedSectors = [] } = Astro.props as Props;
 
 const sourceLabel = isLegacyPost(post) ? "归档文章" : "原生文章";
 const sourceDescription = isLegacyPost(post) ? "从旧站迁移并重新整理" : "在 Astro 中原生发布";
+const dossierLabel = isLegacyPost(post) ? "Archive Dossier" : "Active Dossier";
 const readingMinutes = Math.max(
   1,
   Math.round(
@@ -20,6 +23,23 @@ const readingMinutes = Math.max(
   )
 );
 const topic = post.data.topic || post.data.categories[0] || "研究记录";
+const routeTags = [
+  ...relatedSectors.map((sector) => ({
+    label: sector.title,
+    href: `/sectors/${sector.slug}/`,
+    soft: false
+  })),
+  ...post.data.categories.map((category: string) => ({
+    label: category,
+    href: `/categories/${encodeURIComponent(category)}/`,
+    soft: false
+  })),
+  ...post.data.tags.map((tag: string) => ({
+    label: `#${tag}`,
+    href: `/tags/${encodeURIComponent(tag)}/`,
+    soft: true
+  }))
+].slice(0, 6);
 ---
 
 <article class="article-shell">
@@ -32,12 +52,18 @@ const topic = post.data.topic || post.data.categories[0] || "研究记录";
           <span>{sourceLabel}</span>
         </div>
         <span class="eyebrow eyebrow--muted">{topic}</span>
+        <div class="article-hero__status">
+          <span class="status-pill status-pill--accent">{dossierLabel}</span>
+          <span class="status-pill">{readingMinutes} 分钟阅读</span>
+          <span class="status-pill">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+        </div>
         <h1>{post.data.title}</h1>
         <p class="article-summary">{post.data.description}</p>
       </div>
 
-      <aside class="article-specs">
+      <aside class="article-specs article-specs--dossier">
         <div class="article-specs__head">
+          <span class="archive-card__stamp">{dossierLabel}</span>
           <span class="card-kicker">Article Brief</span>
           <p>{sourceDescription}</p>
         </div>
@@ -63,17 +89,18 @@ const topic = post.data.topic || post.data.categories[0] || "研究记录";
       </aside>
     </div>
 
-    <div class="article-taxonomy">
-      {post.data.categories.map((category: string) => (
-        <a class="meta-chip" href={`/categories/${encodeURIComponent(category)}/`}>
-          {category}
-        </a>
-      ))}
-      {post.data.tags.map((tag: string) => (
-        <a class="meta-chip meta-chip--soft" href={`/tags/${encodeURIComponent(tag)}/`}>
-          #{tag}
-        </a>
-      ))}
+    <div class="article-route-panel">
+      <div class="article-route-panel__head">
+        <span class="card-kicker">关联路径</span>
+        <p>从所属战区和主题分卷继续扩展阅读，而不是只停在单篇卷宗里。</p>
+      </div>
+      <div class="article-taxonomy">
+        {routeTags.map((route) => (
+          <a class={`meta-chip ${route.soft ? "meta-chip--soft" : ""}`} href={route.href}>
+            {route.label}
+          </a>
+        ))}
+      </div>
     </div>
   </div>
 

@@ -4,6 +4,8 @@ import type { GetStaticPaths } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import EntryDetailShell from "../../components/site/EntryDetailShell.astro";
 import { getCollectionSlug, type ResearchEntry } from "../../lib/content/posts";
+import { getSectorGraph } from "../../lib/theme-sectors/get-sector-graph";
+import { resolveAssetSectorContext } from "../../lib/theme-sectors/sector-presenters";
 
 interface Props {
   entry: ResearchEntry;
@@ -19,6 +21,8 @@ export const getStaticPaths = (async () => {
 
 const { entry } = Astro.props as Props;
 const { Content } = await render(entry);
+const sectorGraph = await getSectorGraph();
+const { relatedSectors } = resolveAssetSectorContext(sectorGraph.sectors, `/research/${getCollectionSlug(entry)}/`);
 ---
 
 <BaseLayout title={`${entry.data.title} | 研究`} description={entry.data.description} path="/research">
@@ -31,6 +35,7 @@ const { Content } = await render(entry);
       { label: entry.data.title }
     ]}
     chips={[
+      ...relatedSectors.map((sector) => ({ label: sector.title, href: `/sectors/${sector.slug}/` })),
       { label: entry.data.focus },
       { label: entry.data.status }
     ]}
@@ -41,7 +46,7 @@ const { Content } = await render(entry);
       { label: "显示优先级", value: entry.data.order }
     ]}
     noteTitle="Research Detail"
-    note="研究详情页负责更完整地解释一个方向，而不是只留下卡片级摘要。"
+    note="研究详情页现在承担战区资产说明角色：它不替代战区总览，而是为某条主题线补足完整背景与长期说明。"
   >
     <Content />
   </EntryDetailShell>

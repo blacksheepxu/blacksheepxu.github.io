@@ -1,0 +1,73 @@
+---
+import type { ResearchEntry } from "../../lib/content/posts";
+import { getCollectionSlug } from "../../lib/content/posts";
+
+interface Props {
+  entries: ResearchEntry[];
+}
+
+const { entries } = Astro.props as Props;
+const featuredEntries = entries.filter((entry) => entry.data.featured);
+---
+
+<div class="research-view-grid research-view-grid--map">
+  <div class="stack">
+    <div class="command-note command-note--emphasis">
+      <span class="card-kicker">Map Layer</span>
+      <h3>把研究方向看成一张可读的战区版图</h3>
+      <p>地图视图不追求拟真图谱，而是让方向、状态和深入入口在同一眼里变得清楚，像在战术地图里锁定扇区。</p>
+    </div>
+
+    <div class="command-note">
+      <span class="card-kicker">Map Legend</span>
+      <ul class="strategy-signal-list">
+        <li>
+          <strong>重点扇区</strong>
+          <span>{featuredEntries.length || entries.length}</span>
+        </li>
+        <li>
+          <strong>状态识别</strong>
+          <span>Active / Planned / Prototype</span>
+        </li>
+        <li>
+          <strong>阅读方式</strong>
+          <span>先看焦点，再进条目</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="map-board">
+    <div class="map-board__legend">
+      <span>Sector Map</span>
+      <span>{entries.length} 个扇区节点</span>
+    </div>
+
+    <div class="node-grid">
+      {entries.map((entry, index) => (
+        <article
+          class="node-card node-card--sector"
+          data-status={entry.data.status}
+          data-priority={entry.data.featured ? "high" : "normal"}
+        >
+          <div class="node-card__head">
+            <span class="node-card__index">{String(index + 1).padStart(2, "0")}</span>
+            <span class="meta-chip">{entry.data.status}</span>
+          </div>
+          <h3>{entry.data.title}</h3>
+          <p>{entry.data.description}</p>
+          <div class="meta-row">
+            <span class="meta-chip">{entry.data.focus}</span>
+            <span class="meta-chip meta-chip--soft">{entry.data.featured ? "重点轨道" : "持续跟进"}</span>
+          </div>
+          <div class="node-card__footer">
+            <span class="archive-card__source">{entry.data.featured ? "Priority Sector" : "Field Sector"}</span>
+            <a class="node-card__link" href={`/research/${getCollectionSlug(entry)}/`}>
+              查看方向
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</div>

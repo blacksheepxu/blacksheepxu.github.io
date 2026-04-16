@@ -1,0 +1,65 @@
+---
+import type { ResearchEntry } from "../../lib/content/posts";
+import { getCollectionSlug } from "../../lib/content/posts";
+
+interface Props {
+  entries: ResearchEntry[];
+}
+
+const { entries } = Astro.props as Props;
+---
+
+<div class="research-view-grid research-view-grid--archive">
+  <div class="stack">
+    <div class="command-note command-note--emphasis">
+      <span class="card-kicker">Archive Layer</span>
+      <h3>把研究条目当作情报卷宗来浏览</h3>
+      <p>档案视图更适合按焦点、状态和优先级去理解每条研究轨道的角色，而不是单纯顺着卡片列表往下读。</p>
+    </div>
+
+    <div class="command-note">
+      <span class="card-kicker">File Rules</span>
+      <ul class="strategy-signal-list">
+        <li>
+          <strong>优先级</strong>
+          <span>Featured 轨道优先展开</span>
+        </li>
+        <li>
+          <strong>状态</strong>
+          <span>按当前推进状态区分</span>
+        </li>
+        <li>
+          <strong>入口</strong>
+          <span>每份卷宗都可直达详情</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dossier-grid">
+    {entries.map((entry) => (
+      <article class="dossier-card" data-status={entry.data.status} data-priority={entry.data.featured ? "high" : "normal"}>
+        <div class="dossier-card__stamp">{entry.data.featured ? "Priority File" : "Field File"}</div>
+        <div class="dossier-card__head">
+          <span class="card-kicker">Research Dossier</span>
+          <span class="meta-chip">{entry.data.status}</span>
+        </div>
+        <h3>{entry.data.title}</h3>
+        <p>{entry.data.description}</p>
+        <div class="dossier-card__meta-grid">
+          <div class="dossier-card__meta">
+            <span>Focus</span>
+            <strong>{entry.data.focus}</strong>
+          </div>
+          <div class="dossier-card__meta">
+            <span>Queue</span>
+            <strong>{String(entry.data.order).padStart(2, "0")}</strong>
+          </div>
+        </div>
+        <a class="dossier-card__link" href={`/research/${getCollectionSlug(entry)}/`}>
+          打开卷宗
+        </a>
+      </article>
+    ))}
+  </div>
+</div>

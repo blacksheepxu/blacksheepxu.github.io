@@ -1,0 +1,127 @@
+---
+import type { PostEntry, ResearchEntry } from "../../lib/content/posts";
+import ResearchMapView from "./ResearchMapView.astro";
+import ResearchArchiveView from "./ResearchArchiveView.astro";
+import ResearchTimeline from "./ResearchTimeline.astro";
+
+interface Props {
+  entries: ResearchEntry[];
+  posts: PostEntry[];
+}
+
+const { entries, posts } = Astro.props as Props;
+const activeEntries = entries.filter((entry) => entry.data.status === "active").length;
+---
+
+<section class="research-console panel theme-shell--command">
+  <div class="research-console__grid">
+    <div class="research-console__copy">
+      <div class="article-path">
+        <a href="/">首页</a>
+        <span>/</span>
+        <a href="/research">研究</a>
+        <span>/</span>
+        <span>策略视图</span>
+      </div>
+      <span class="eyebrow eyebrow--muted">Research Command Views</span>
+      <div class="command-board__status">
+        <span class="status-pill status-pill--accent">战区地图就绪</span>
+        <span class="status-pill">卷宗索引同步</span>
+        <span class="status-pill status-pill--alert">近期轨迹可回放</span>
+      </div>
+      <h2>像看战区态势一样看研究版图。</h2>
+      <p>研究页在策略主题下不只是列表页，而是允许你从方向分布、卷宗索引和时间轨迹三个维度切换理解同一批内容。</p>
+    </div>
+
+    <aside class="research-console__sidebar">
+      <div class="research-console__summary">
+        <strong>Research Brief</strong>
+        <p>先判断哪些方向仍在推进，再决定是看结构层、看卷宗层，还是直接回看最近的内容增长。</p>
+        <ul class="strategy-signal-list strategy-signal-list--compact">
+          <li>
+            <strong>当前主战区</strong>
+            <span>{entries.find((entry) => entry.data.featured)?.data.focus ?? "研究地图"}</span>
+          </li>
+          <li>
+            <strong>活跃信号</strong>
+            <span>{activeEntries} / {entries.length}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-card">
+          <strong>{entries.length}</strong>
+          <span>研究轨道</span>
+        </div>
+        <div class="metric-card">
+          <strong>{activeEntries}</strong>
+          <span>活跃方向</span>
+        </div>
+        <div class="metric-card">
+          <strong>{posts.length}</strong>
+          <span>相关内容</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="mode-shell" data-mode-shell data-mode-default="map">
+    <div class="mode-switcher" aria-label="研究视图切换">
+      <button type="button" data-mode-trigger="map" aria-pressed="true">地图</button>
+      <button type="button" data-mode-trigger="archive" aria-pressed="false">档案</button>
+      <button type="button" data-mode-trigger="timeline" aria-pressed="false">轨迹</button>
+    </div>
+
+    <div class="mode-panel" data-mode-panel="map">
+      <ResearchMapView entries={entries} />
+    </div>
+
+    <div class="mode-panel" data-mode-panel="archive" hidden>
+      <ResearchArchiveView entries={entries} />
+    </div>
+
+    <div class="mode-panel" data-mode-panel="timeline" hidden>
+      <div class="stack">
+        <div class="command-note command-note--emphasis">
+          <span class="card-kicker">Timeline Layer</span>
+          <h3>按最近推进记录回放研究节奏</h3>
+          <p>轨迹视图保留时间维度，帮助你快速判断最近有哪些方向真的在被推进，而不只是停留在计划层。</p>
+        </div>
+        <ResearchTimeline posts={posts} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const syncModeShell = (shell: HTMLElement) => {
+    const buttons = shell.querySelectorAll<HTMLButtonElement>("[data-mode-trigger]");
+    const panels = shell.querySelectorAll<HTMLElement>("[data-mode-panel]");
+
+    const applyMode = (mode?: string) => {
+      buttons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.modeTrigger === mode));
+      });
+
+      panels.forEach((panel) => {
+        panel.hidden = panel.dataset.modePanel !== mode;
+      });
+    };
+
+    const defaultMode = shell.dataset.modeDefault || buttons[0]?.dataset.modeTrigger;
+    applyMode(defaultMode);
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        applyMode(button.dataset.modeTrigger);
+      });
+    });
+  };
+
+  document.querySelectorAll("[data-mode-shell]").forEach((shell) => {
+    if (shell instanceof HTMLElement) {
+      syncModeShell(shell);
+    }
+  });
+</script>

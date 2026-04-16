@@ -1,0 +1,109 @@
+---
+import type { ThemeSector } from "../../lib/theme-sectors/sector-graph";
+import { getSectorHeatLabel } from "../../lib/theme-sectors/sector-presenters";
+
+interface Props {
+  sectors: ThemeSector[];
+  defaultFocusedSlug: string;
+}
+
+const { sectors, defaultFocusedSlug } = Astro.props as Props;
+const titleMap = new Map(sectors.map((sector) => [sector.slug, sector.title]));
+const roleLabelMap: Record<ThemeSector["role"], string> = {
+  primary: "总主战区",
+  support: "支援战区",
+  calibration: "校准战区",
+  dynamic: "机动补位",
+  peripheral: "外围散点"
+};
+---
+
+<aside class="sector-inspector">
+  {sectors.map((sector) => (
+    <article
+      class="sector-inspector__panel"
+      data-sector-panel={sector.slug}
+      data-sector-role={sector.role}
+      hidden={sector.slug !== defaultFocusedSlug}
+    >
+      <div class="sector-inspector__hero">
+        <div class="sector-inspector__headband">
+          <span class="card-kicker">Sector Brief</span>
+          <span class="meta-chip">{getSectorHeatLabel(sector)}</span>
+        </div>
+
+        <div class="sector-inspector__hero-grid">
+          <div class="sector-inspector__titleblock">
+            <span class="sector-inspector__role">{roleLabelMap[sector.role]}</span>
+            <h3>{sector.title}</h3>
+            <p>{sector.summary}</p>
+          </div>
+
+          <div class="sector-inspector__actions">
+            <a class="button button--primary" href={`/sectors/${sector.slug}/`}>
+              进入战区
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sector-inspector__dashboard">
+        <div class="sector-inspector__metrics">
+          <div class="sector-inspector__metric sector-inspector__metric--accent">
+            <span>资产数</span>
+            <strong>{sector.assetCount}</strong>
+          </div>
+          <div class="sector-inspector__metric">
+            <span>活跃信号</span>
+            <strong>{sector.recentActivity}</strong>
+          </div>
+          <div class="sector-inspector__metric">
+            <span>主子主题</span>
+            <strong>{sector.dominantTopic}</strong>
+          </div>
+        </div>
+
+        <div class="sector-inspector__carriers">
+          <article class="sector-carrier-lane">
+            <span class="card-kicker">Blog</span>
+            <strong>{sector.assets.filter((asset) => asset.kind === "post").length}</strong>
+          </article>
+          <article class="sector-carrier-lane">
+            <span class="card-kicker">Research</span>
+            <strong>{sector.assets.filter((asset) => asset.kind === "research").length}</strong>
+          </article>
+          <article class="sector-carrier-lane">
+            <span class="card-kicker">Lab</span>
+            <strong>{sector.assets.filter((asset) => asset.kind === "lab").length}</strong>
+          </article>
+        </div>
+      </div>
+
+      <div class="sector-inspector__content-grid">
+        {sector.relatedSlugs.length > 0 && (
+          <div class="sector-inspector__relations">
+            <span class="card-kicker">关联战区</span>
+            <div class="article-taxonomy">
+              {sector.relatedSlugs.map((slug) => (
+                <span class="meta-chip meta-chip--soft">{titleMap.get(slug) ?? slug}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div class="sector-inspector__assets">
+          <span class="card-kicker">代表资产</span>
+          <div class="sector-signal-grid">
+            {sector.leadAssets.map((asset) => (
+              <article class="sector-signal-card">
+                <span>{asset.kind}</span>
+                <strong>{asset.title}</strong>
+                <p>{asset.signalLabel}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </article>
+  ))}
+</aside>

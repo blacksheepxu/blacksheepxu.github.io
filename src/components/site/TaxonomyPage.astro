@@ -15,8 +15,14 @@ interface Props {
 }
 
 const { item, label, description } = Astro.props;
-const newestPost = [...item.items].sort((left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime())[0];
+const sortedItems = [...item.items].sort((left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime());
+const newestPost = sortedItems[0];
 const legacyCount = item.items.filter((post) => post.data.source === "legacy").length;
+const themeRole = label === "标签" ? "跨主题线索" : "主主题分卷";
+const routeSummary =
+  label === "标签"
+    ? "适合先看最近更新，再决定是否回到博客总库继续扩展阅读。"
+    : "适合作为一个主主题分卷来连续阅读，再回到博客频道补全外围内容。";
 ---
 
 <BaseLayout title={`${item.name} | ${label}`} description={`与 ${item.name} 相关的文章集合。`} path="/blog">
@@ -39,21 +45,54 @@ const legacyCount = item.items.filter((post) => post.data.source === "legacy").l
       { label: "最近更新", value: newestPost?.data.pubDate.toISOString().slice(0, 10) ?? "-" }
     ]}
     noteTitle="Archive Note"
-    note="这里保留基于标签和分类的发现入口，但它们现在是辅助导航，而不是整站的主叙事框架。"
+    note="这里不是普通分类页，而是博客频道里的单主题分卷入口，用来把同一条线索下的记录重新收拢。"
   />
+
+  <section class="page-section panel taxonomy-intel">
+    <div class="section-head">
+      <div>
+        <h2>分卷定位</h2>
+        <p>先知道这个主题在博客体系里扮演什么角色，再决定从哪一篇开始进入。</p>
+      </div>
+    </div>
+
+    <div class="taxonomy-intel__grid">
+      <article class="command-note command-note--emphasis">
+        <span class="card-kicker">Theme Role</span>
+        <h3>{themeRole}</h3>
+        <p>{routeSummary}</p>
+      </article>
+      <article class="command-note">
+        <span class="card-kicker">Recent Activity</span>
+        <h3>{newestPost?.data.pubDate.toISOString().slice(0, 10) ?? "-"}</h3>
+        <p>{newestPost?.data.title ?? "当前分卷还没有可展示的最近更新。"}</p>
+      </article>
+      <article class="command-note">
+        <span class="card-kicker">Related Routes</span>
+        <div class="article-taxonomy">
+          <a class="meta-chip" href="/blog">返回博客总库</a>
+          {newestPost && (
+            <a class="meta-chip meta-chip--soft" href={getPostHref(newestPost)}>
+              先看最近一篇
+            </a>
+          )}
+        </div>
+      </article>
+    </div>
+  </section>
 
   <section class="page-section panel">
     <div class="section-head">
       <div>
-        <h2>相关内容</h2>
-        <p>继续从这个主题往下看，入口保持轻量，但信息足够完整。</p>
+        <h2>分卷档案</h2>
+        <p>这一批记录属于同一主题线索，适合顺着编号一路读下去。</p>
       </div>
     </div>
     <div class="archive-grid">
-      {item.items.map((post) => (
-        <article class="content-card archive-card">
+      {sortedItems.map((post, index) => (
+        <article class={`content-card archive-card ${index === 0 ? "archive-card--priority" : "archive-card--record"} ${post.data.source === "legacy" ? "archive-card--legacy" : "archive-card--native"}`}>
           <div class="archive-card__head">
-            <span class="card-kicker">{post.data.source === "legacy" ? "Legacy Entry" : "Native Note"}</span>
+            <span class="archive-card__stamp">File {String(index + 1).padStart(2, "0")}</span>
             <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
           </div>
           <h3 class="archive-card__title">

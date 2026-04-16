@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { buildTaxonomyMap, getPostHref, getPosts, isLegacyPost, type PostEntry } from "../../lib/content/posts";
+import { getSectorGraph } from "../../lib/theme-sectors/get-sector-graph";
+import { getCarrierSectors } from "../../lib/theme-sectors/sector-presenters";
 import { siteMeta } from "../../data/site";
 
 const posts = await getPosts();
@@ -8,9 +10,35 @@ const nativeCount = posts.filter((post) => !isLegacyPost(post)).length;
 const legacyCount = posts.length - nativeCount;
 const categories = buildTaxonomyMap(posts, "categories");
 const topicCount = categories.length;
+const newestPost = posts[0];
 const highlightedCategories = [...categories]
   .sort((left, right) => right.items.length - left.items.length)
-  .slice(0, 4);
+  .slice(0, 5);
+const priorityPosts = [...posts]
+  .sort(
+    (left, right) =>
+      Number(right.data.featured) - Number(left.data.featured) || right.data.pubDate.getTime() - left.data.pubDate.getTime()
+  )
+  .slice(0, 3);
+const prioritySet = new Set(priorityPosts.map((post) => post.id));
+const archivePosts = posts.filter((post) => !prioritySet.has(post.id));
+const completeArchive = archivePosts.length > 0 ? archivePosts : posts;
+const dominantCategory = highlightedCategories[0]?.name ?? "研究记录";
+const readingRoute = nativeCount > 0 ? "先看原生笔记，再回到归档旧文补全上下文。" : "先看重点卷宗，再进入完整档案理解长期积累。";
+const sectorGraph = await getSectorGraph();
+const carrierSectors = getCarrierSectors(sectorGraph.sectors, "post");
+
+const getPriorityReason = (post: PostEntry) => {
+  if (post.data.featured) {
+    return "被标记为重点条目，适合作为当前写作档案的主入口。";
+  }
+
+  if (!isLegacyPost(post)) {
+    return "较新的原生笔记，更适合作为当前研究脉络的第一站。";
+  }
+
+  return "这篇归档旧文代表较早的关键积累，适合补全背景与方法脉络。";
+};
 ---
 
 <BaseLayout
@@ -29,9 +57,14 @@ const highlightedCategories = [...categories]
         <span class="eyebrow eyebrow--muted">Writing Archive</span>
         <h1>博客</h1>
         <p class="archive-summary">
-          旧文章保留，新笔记继续生长。这里更像研究目录，而不是按年月堆叠的归档页。
+          原生笔记、迁移旧文和研究日志都在这里归档。先看重点卷宗，再进入完整档案去追踪长期积累。
         </p>
         <div class="article-taxonomy">
+          {carrierSectors.map((sector) => (
+            <a class="meta-chip meta-chip--soft" href={`/sectors/${sector.slug}/`}>
+              {sector.title}
+            </a>
+          ))}
           {highlightedCategories.map(({ name }) => (
             <a class="meta-chip" href={`/categories/${encodeURIComponent(name)}/`}>
               {name}
@@ -40,7 +73,11 @@ const highlightedCategories = [...categories]
         </div>
       </div>
 
-      <aside class="archive-specs">
+      <aside class="archive-specs archive-specs--board">
+        <div class="archive-status-board__head">
+          <span class="card-kicker">Archive Status Board</span>
+          <p>博客频道负责收纳全部写作资产，并把值得先看的入口抬到前面。</p>
+        </div>
         <div class="archive-metric">
           <span>文章总数</span>
           <strong>{posts.length}</strong>
@@ -60,25 +97,86 @@ const highlightedCategories = [...categories]
       </aside>
     </div>
 
-    <div class="archive-signal">
-      <span class="card-kicker">Archive Note</span>
-      <p>博客页负责收纳完整写作资产；真正的主入口仍然是首页、研究页和实验页。</p>
+    <div class="archive-briefing">
+      <article class="archive-briefing__item">
+        <span class="card-kicker">Current Focus</span>
+        <strong>{dominantCategory}</strong>
+        <p>当前最密集的主题分卷，适合作为博客频道的第一条主线。</p>
+      </article>
+      <article class="archive-briefing__item">
+        <span class="card-kicker">Latest Signal</span>
+        <strong>{newestPost?.data.pubDate.toISOString().slice(0, 10) ?? "-"}</strong>
+        <p>{newestPost?.data.title ?? "等待下一篇记录入库。"}</p>
+      </article>
+      <article class="archive-briefing__item">
+        <span class="card-kicker">Reading Route</span>
+        <strong>Priority Dossiers</strong>
+        <p>{readingRoute}</p>
+      </article>
+      <article class="archive-briefing__item">
+        <span class="card-kicker">Archive Note</span>
+        <strong>{nativeCount} : {legacyCount}</strong>
+        <p>博客现在是战区资产载体之一：原生内容与归档旧文共存，负责把长期写作沉淀到主题版图里。</p>
+      </article>
     </div>
   </section>
 
   <section class="page-section panel">
     <div class="section-head">
       <div>
-        <h2>全部文章</h2>
-        <p>按时间排序浏览，也可以从分类和标签继续进入具体主题。</p>
+        <h2>重点卷宗</h2>
+        <p>先进入当前最值得看的情报卷宗，再决定是否回到完整档案继续扩展阅读。</p>
       </div>
     </div>
 
-    <div class="archive-grid">
-      {posts.map((post: PostEntry) => (
-        <article class={`content-card archive-card ${isLegacyPost(post) ? "archive-card--legacy" : "archive-card--native"}`}>
+    <div class="archive-grid archive-grid--priority">
+      {priorityPosts.map((post: PostEntry, index) => (
+        <article class={`content-card archive-card archive-card--priority ${isLegacyPost(post) ? "archive-card--legacy" : "archive-card--native"}`}>
           <div class="archive-card__head">
-            <span class="card-kicker">{isLegacyPost(post) ? "Legacy Entry" : "Native Note"}</span>
+            <span class="archive-card__stamp">Priority Dossier {String(index + 1).padStart(2, "0")}</span>
+            <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+          </div>
+          <h3 class="archive-card__title">
+            <a href={getPostHref(post)}>{post.data.title}</a>
+          </h3>
+          <p class="archive-card__summary">{post.data.description}</p>
+          <p class="archive-card__reason">{getPriorityReason(post)}</p>
+          <div class="meta-row">
+            {(post.data.categories.length ? post.data.categories : ["未分类"]).slice(0, 2).map((item: string) => (
+              <a class="meta-chip" href={`/categories/${encodeURIComponent(item)}/`}>
+                {item}
+              </a>
+            ))}
+            {post.data.tags.slice(0, 2).map((item: string) => (
+              <a class="meta-chip meta-chip--soft" href={`/tags/${encodeURIComponent(item)}/`}>
+                #{item}
+              </a>
+            ))}
+          </div>
+          <div class="archive-card__footer">
+            <span class="archive-card__source">{isLegacyPost(post) ? "归档迁移" : "原生发布"}</span>
+            <a class="archive-card__link" href={getPostHref(post)}>
+              打开卷宗
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h2>完整档案</h2>
+        <p>按时间继续浏览全部记录，也可以顺着分类和标签切入更具体的主题分卷。</p>
+      </div>
+    </div>
+
+    <div class="archive-grid archive-grid--records">
+      {completeArchive.map((post: PostEntry, index) => (
+        <article class={`content-card archive-card archive-card--record ${isLegacyPost(post) ? "archive-card--legacy" : "archive-card--native"}`}>
+          <div class="archive-card__head">
+            <span class="archive-card__stamp">Record {String(index + 1).padStart(2, "0")}</span>
             <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
           </div>
           <h3 class="archive-card__title">

@@ -5,10 +5,12 @@ import SectionShell from "../components/home/SectionShell.astro";
 import ResearchFocus from "../components/home/ResearchFocus.astro";
 import FeaturedContent from "../components/home/FeaturedContent.astro";
 import RecentWriting from "../components/home/RecentWriting.astro";
+import HomeCommandViews from "../components/home/HomeCommandViews.astro";
 import CadenceSummary from "../components/stats/CadenceSummary.astro";
 import TopicDistributionSummary from "../components/stats/TopicDistributionSummary.astro";
 import { getFeaturedPosts, getLabEntries, getPosts, getResearchEntries } from "../lib/content/posts";
 import { buildSiteStats } from "../lib/stats/site-stats";
+import { buildSectorGraph } from "../lib/theme-sectors/sector-graph";
 import { siteMeta } from "../data/site";
 
 const [posts, researchEntries, labEntries, featuredPosts] = await Promise.all([
@@ -19,6 +21,7 @@ const [posts, researchEntries, labEntries, featuredPosts] = await Promise.all([
 ]);
 
 const stats = buildSiteStats(posts);
+const sectorGraph = buildSectorGraph({ posts, researchEntries, labEntries });
 ---
 
 <BaseLayout
@@ -26,42 +29,46 @@ const stats = buildSiteStats(posts);
   description={siteMeta.description}
   path="/"
 >
-  <Hero totalPosts={stats.totalPosts} totalTopics={stats.totalTopics} totalYears={stats.totalLegacyYears} />
+  <div class="theme-shell--content">
+    <Hero totalPosts={stats.totalPosts} totalTopics={stats.totalTopics} totalYears={stats.totalLegacyYears} />
 
-  <SectionShell
-    title="研究方向"
-    description="当前在追踪的主题和方向。"
-    linkHref="/research"
-    linkLabel="进入研究"
-  >
-    <ResearchFocus entries={researchEntries} />
-  </SectionShell>
+    <SectionShell
+      title="研究方向"
+      description="当前在追踪的主题和方向。"
+      linkHref="/research"
+      linkLabel="进入研究"
+    >
+      <ResearchFocus entries={researchEntries} />
+    </SectionShell>
 
-  <SectionShell
-    title="代表内容与实验入口"
-    description="文章和实验里更值得先看的内容。"
-    linkHref="/lab"
-    linkLabel="查看实验"
-  >
-    <FeaturedContent posts={featuredPosts} labEntries={labEntries} />
-  </SectionShell>
+    <SectionShell
+      title="代表内容与实验入口"
+      description="文章和实验里更值得先看的内容。"
+      linkHref="/lab"
+      linkLabel="查看实验"
+    >
+      <FeaturedContent posts={featuredPosts} labEntries={labEntries} />
+    </SectionShell>
 
-  <SectionShell
-    title="节奏与主题反馈"
-    description="最近写了多少，主要写到了哪些主题。"
-  >
-    <div class="card-grid">
-      <CadenceSummary buckets={stats.cadence} />
-      <TopicDistributionSummary buckets={stats.topics} />
-    </div>
-  </SectionShell>
+    <SectionShell
+      title="节奏与主题反馈"
+      description="最近写了多少，主要写到了哪些主题。"
+    >
+      <div class="card-grid">
+        <CadenceSummary buckets={stats.cadence} />
+        <TopicDistributionSummary buckets={stats.topics} />
+      </div>
+    </SectionShell>
 
-  <SectionShell
-    title="近期写作"
-    description="新旧内容都从这里进入。"
-    linkHref="/blog"
-    linkLabel="浏览全部文章"
-  >
-    <RecentWriting posts={posts} />
-  </SectionShell>
+    <SectionShell
+      title="近期写作"
+      description="新旧内容都从这里进入。"
+      linkHref="/blog"
+      linkLabel="浏览全部文章"
+    >
+      <RecentWriting posts={posts} />
+    </SectionShell>
+  </div>
+
+  <HomeCommandViews graph={sectorGraph} />
 </BaseLayout>

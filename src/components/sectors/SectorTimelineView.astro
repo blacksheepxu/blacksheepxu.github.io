@@ -1,0 +1,30 @@
+---
+import type { ThemeSector } from "../../lib/theme-sectors/sector-graph";
+
+interface Props {
+  sector: ThemeSector;
+}
+
+const { sector } = Astro.props as Props;
+const milestones = [...sector.assets].sort((left, right) => (right.timestamp?.getTime() ?? -1) - (left.timestamp?.getTime() ?? -1));
+---
+
+<div class="stack timeline-stack">
+  {milestones.map((asset) => (
+    <article class="content-card timeline-card">
+      <div class="archive-card__head">
+        <span class="card-kicker">{asset.kind}</span>
+        <span class="meta-chip">{asset.timestamp ? asset.timestamp.toISOString().slice(0, 10) : "长期条目"}</span>
+      </div>
+      <h3 class="archive-card__title">
+        <a href={asset.href}>{asset.title}</a>
+      </h3>
+      <p class="archive-card__summary">{asset.description}</p>
+      <div class="meta-row">
+        {asset.topics.slice(0, 2).map((topic) => (
+          <span class="meta-chip meta-chip--soft">{topic}</span>
+        ))}
+      </div>
+    </article>
+  ))}
+</div>

@@ -19,6 +19,7 @@ focus: 研究地图
 status: active
 featured: true
 order: 1
+updatedAt: 2026-04-16
 ---`;
 
 const labTemplate = `---
@@ -28,6 +29,7 @@ kind: demo
 status: prototype
 featured: false
 order: 10
+updatedAt: 2026-04-16
 ---`;
 ---
 
@@ -53,7 +55,7 @@ order: 10
 
       <article class="content-card">
         <h3>研究</h3>
-        <p>适合整理一个方向、专题或阶段性版图。</p>
+        <p>适合整理一个方向、专题或阶段性版图。若希望参与“近期活跃”信号，请填写 `updatedAt`。</p>
         <div class="meta-row">
           <span class="meta-chip">src/content/research/</span>
           <span class="meta-chip">.mdx</span>
@@ -63,7 +65,7 @@ order: 10
 
       <article class="content-card">
         <h3>实验</h3>
-        <p>适合图表、小工具和展示型 demo。</p>
+        <p>适合图表、小工具和展示型 demo。若希望参与“近期活跃”信号，请填写 `updatedAt`。</p>
         <div class="meta-row">
           <span class="meta-chip">src/content/lab/</span>
           <span class="meta-chip">.mdx</span>
@@ -77,7 +79,7 @@ order: 10
     <div class="section-head">
       <div>
         <h2>补充入口</h2>
-        <p>常用修改点和本地命令。</p>
+        <p>常用修改点、本地命令和多主题治理入口。</p>
       </div>
     </div>
 
@@ -94,6 +96,19 @@ order: 10
         <h3>本地预览</h3>
         <Code code="npm run dev" lang="bash" theme="github-light" />
         <p>保存后会自动刷新。</p>
+      </article>
+      <article class="content-card content-card--signal">
+        <h3>主题维护手册</h3>
+        <p>`docs/theme-maintenance.md`</p>
+        <p>新增内容、改页面或后续增加新主题时，先看这里的统一规则。</p>
+      </article>
+      <article class="content-card">
+        <h3>代码变更清单</h3>
+        <p>`docs/checklists/theme-code-change-checklist.md`</p>
+      </article>
+      <article class="content-card">
+        <h3>内容更新清单</h3>
+        <p>`docs/checklists/theme-content-update-checklist.md`</p>
       </article>
     </div>
   </section>

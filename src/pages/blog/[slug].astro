@@ -2,7 +2,9 @@
 import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ArticleShell from "../../components/site/ArticleShell.astro";
-import { getNativeStaticPaths, getPosts, type PostEntry } from "../../lib/content/posts";
+import { getNativeStaticPaths, getPostHref, getPosts, type PostEntry } from "../../lib/content/posts";
+import { getSectorGraph } from "../../lib/theme-sectors/get-sector-graph";
+import { resolveAssetSectorContext } from "../../lib/theme-sectors/sector-presenters";
 
 interface Props {
   post: PostEntry;
@@ -14,10 +16,12 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props as Props;
 const { Content } = await render(post);
+const sectorGraph = await getSectorGraph();
+const { relatedSectors } = resolveAssetSectorContext(sectorGraph.sectors, getPostHref(post));
 ---
 
 <BaseLayout title={`${post.data.title} | 博客`} description={post.data.description} path="/blog">
-  <ArticleShell post={post}>
+  <ArticleShell post={post} relatedSectors={relatedSectors}>
     <div class="prose">
       <Content />
     </div>

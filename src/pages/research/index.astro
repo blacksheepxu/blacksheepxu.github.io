@@ -3,12 +3,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ChannelHero from "../../components/site/ChannelHero.astro";
 import ResearchCard from "../../components/research/ResearchCard.astro";
 import ResearchTimeline from "../../components/research/ResearchTimeline.astro";
+import ResearchModeSwitcher from "../../components/research/ResearchModeSwitcher.astro";
 import { buildTaxonomyMap, getCollectionSlug, getPosts, getResearchEntries, type ResearchEntry } from "../../lib/content/posts";
+import { getSectorGraph } from "../../lib/theme-sectors/get-sector-graph";
+import { getCarrierSectors } from "../../lib/theme-sectors/sector-presenters";
 import { siteMeta } from "../../data/site";
 
 const [entries, posts] = await Promise.all([getResearchEntries(), getPosts()]);
 const activeEntries = entries.filter((entry) => entry.data.status === "active").length;
 const topicCount = buildTaxonomyMap(posts, "categories").length;
+const sectorGraph = await getSectorGraph();
+const carrierSectors = getCarrierSectors(sectorGraph.sectors, "research");
 ---
 
 <BaseLayout
@@ -20,8 +25,11 @@ const topicCount = buildTaxonomyMap(posts, "categories").length;
     pathLabel="研究"
     eyebrow="Research Modes"
     title="研究"
-    summary="按方向、方法和代表内容整理研究资产，让重点问题、长期主题和最近轨迹在同一页里对齐。"
-    chips={entries.map((entry) => ({ label: entry.data.focus, href: `/research/${getCollectionSlug(entry)}/` }))}
+    summary="这里现在是主题战区下的研究资产载体，用来承接长期方向、方法说明和代表性研究条目。"
+    chips={[
+      ...carrierSectors.map((sector) => ({ label: sector.title, href: `/sectors/${sector.slug}/` })),
+      ...entries.map((entry) => ({ label: entry.data.focus, href: `/research/${getCollectionSlug(entry)}/` }))
+    ]}
     metrics={[
       { label: "研究轨道", value: entries.length },
       { label: "活跃方向", value: activeEntries },
@@ -29,28 +37,32 @@ const topicCount = buildTaxonomyMap(posts, "categories").length;
       { label: "主题分类", value: topicCount }
     ]}
     noteTitle="Research Note"
-    note="研究页负责定义你在长期关注什么，以及这些方向是如何通过文章和实验继续扩展的。"
+    note="研究页不再是首页主叙事，而是策略主题下的研究资产表面：用于补足战区的长期方向说明与结构化背景。"
   />
 
-  <section class="page-section panel">
-    <div class="section-head">
-      <div>
-        <h2>研究版图</h2>
-        <p>每一条研究轨道都尽量说明主题、当前状态和继续展开的入口。</p>
+  <div class="theme-shell--content">
+    <section class="page-section panel">
+      <div class="section-head">
+        <div>
+          <h2>研究版图</h2>
+          <p>每一条研究轨道都尽量说明主题、当前状态和继续展开的入口。</p>
+        </div>
       </div>
-    </div>
-    <div class="card-grid">
-      {entries.map((entry: ResearchEntry) => <ResearchCard entry={entry} />)}
-    </div>
-  </section>
+      <div class="card-grid">
+        {entries.map((entry: ResearchEntry) => <ResearchCard entry={entry} />)}
+      </div>
+    </section>
 
-  <section class="page-section panel">
-    <div class="section-head">
-      <div>
-        <h2>最近的内容轨迹</h2>
-        <p>按时间查看研究内容如何继续增长，而不是只看单次输出。</p>
+    <section class="page-section panel">
+      <div class="section-head">
+        <div>
+          <h2>最近的内容轨迹</h2>
+          <p>按时间查看研究内容如何继续增长，而不是只看单次输出。</p>
+        </div>
       </div>
-    </div>
-    <ResearchTimeline posts={posts} />
-  </section>
+      <ResearchTimeline posts={posts} />
+    </section>
+  </div>
+
+  <ResearchModeSwitcher entries={entries} posts={posts} />
 </BaseLayout>
