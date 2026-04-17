@@ -23,6 +23,14 @@ const tickerMessages = [
   `DYNAMIC SLOT // ${layout.dynamicSector.title}`,
   `PERIPHERAL COUNT // ${layout.peripheralSectors.length}`
 ];
+
+const nextStepCopyMap: Record<ThemeSector["role"], string> = {
+  primary: "进入总览，先看主线热度、代表资产和时间推进，再决定是否继续下钻。",
+  support: "进入战区后重点查看它如何为总主战区补充工具、路径或支援资产。",
+  calibration: "进入战区后优先看它如何修正判断、概念框架和研究方向的偏差。",
+  dynamic: "这是当前正在升温的补位战区，进入后先确认它是否已经值得转入长期主线。",
+  peripheral: "这是外围观察点，进入后更适合做快速判断，而不是承担中心叙事。"
+};
 ---
 
 <section class="command-board panel theme-shell--command sector-command sector-command--overhauled">
@@ -82,22 +90,21 @@ const tickerMessages = [
     <div class="sector-command__briefing">
       <SectorInspectorPanel sectors={orderedSectors} defaultFocusedSlug={graph.defaultFocusedSlug} />
 
-      <div class="sector-command__protocol">
-        <span class="card-kicker">指挥协议</span>
-        <ul class="strategy-signal-list">
-          <li>
-            <strong>第一步</strong>
-            <span>先在战术沙盘上锁定一个战区</span>
-          </li>
-          <li>
-            <strong>第二步</strong>
-            <span>阅读下方战区简报，确认热度与载体结构</span>
-          </li>
-          <li>
-            <strong>第三步</strong>
-            <span>只在确认后进入该战区页继续选资产</span>
-          </li>
-        </ul>
+      <div class="sector-command__selection">
+        {orderedSectors.map((sector) => (
+          <article
+            class="sector-command__selection-card"
+            data-sector-panel={sector.slug}
+            hidden={sector.slug !== graph.defaultFocusedSlug}
+          >
+            <span class="card-kicker">当前锁定</span>
+            <strong>{sector.title}</strong>
+            <p>{nextStepCopyMap[sector.role]}</p>
+            <a class="button" href={`/sectors/${sector.slug}/`}>
+              打开 {sector.title}
+            </a>
+          </article>
+        ))}
       </div>
     </div>
   </div>

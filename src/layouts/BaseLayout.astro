@@ -10,6 +10,7 @@ import { defaultTheme, defaultThemeId, themeRegistry } from "../lib/theme/theme-
 interface NavItem {
   href: string;
   label: string;
+  commandCue?: string;
 }
 
 interface Props {
@@ -24,11 +25,11 @@ const {
   description = siteMeta.description,
   path = "/",
   nav = [
-    { href: "/", label: "首页" },
-    { href: "/blog", label: "博客" },
-    { href: "/research", label: "研究" },
-    { href: "/lab", label: "实验" },
-    { href: "/about", label: "关于" }
+    { href: "/", label: "首页", commandCue: "战区总控" },
+    { href: "/blog", label: "博客", commandCue: "内容卷宗" },
+    { href: "/research", label: "研究", commandCue: "研究载体" },
+    { href: "/lab", label: "实验", commandCue: "交互载体" },
+    { href: "/about", label: "关于", commandCue: "站点背景" }
   ]
 } = Astro.props;
 

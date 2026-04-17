@@ -40,6 +40,11 @@ const routeTags = [
     soft: true
   }))
 ].slice(0, 6);
+const routeMeta = [
+  { label: "载体", value: "博客卷宗" },
+  { label: "来源", value: sourceLabel },
+  { label: "战区", value: relatedSectors.length > 0 ? `${relatedSectors.length} 个关联战区` : "独立归档" }
+];
 ---
 
 <article class="article-shell">
@@ -92,7 +97,14 @@ const routeTags = [
     <div class="article-route-panel">
       <div class="article-route-panel__head">
         <span class="card-kicker">关联路径</span>
-        <p>从所属战区和主题分卷继续扩展阅读，而不是只停在单篇卷宗里。</p>
+        <p>先确认这份卷宗来自哪个载体和哪些战区，再决定是回到上层态势，还是继续在同一路径里深入。</p>
+      </div>
+      <div class="article-route-panel__meta">
+        {routeMeta.map((item) => (
+          <span class="meta-chip meta-chip--soft">
+            {item.label} // {item.value}
+          </span>
+        ))}
       </div>
       <div class="article-taxonomy">
         {routeTags.map((route) => (

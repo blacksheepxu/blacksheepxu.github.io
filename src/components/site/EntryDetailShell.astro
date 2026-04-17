@@ -25,6 +25,9 @@ interface Props {
   metrics?: Metric[];
   noteTitle?: string;
   note?: string;
+  contextTitle?: string;
+  contextSummary?: string;
+  contextChips?: Chip[];
   bodyClass?: string;
 }
 
@@ -37,6 +40,9 @@ const {
   metrics = [],
   noteTitle = "Detail Note",
   note,
+  contextTitle = "Carrier Route",
+  contextSummary,
+  contextChips = [],
   bodyClass = "prose"
 } = Astro.props as Props;
 ---
@@ -51,6 +57,28 @@ const {
   noteTitle={noteTitle}
   note={note}
 />
+
+{(contextSummary || contextChips.length > 0) && (
+  <section class="page-section panel detail-route-panel">
+    <div class="detail-route-panel__head">
+      <span class="card-kicker">{contextTitle}</span>
+      {contextSummary && <p>{contextSummary}</p>}
+    </div>
+    {contextChips.length > 0 && (
+      <div class="article-taxonomy">
+        {contextChips.map((chip) =>
+          chip.href ? (
+            <a class="meta-chip" href={chip.href}>
+              {chip.label}
+            </a>
+          ) : (
+            <span class="meta-chip meta-chip--soft">{chip.label}</span>
+          )
+        )}
+      </div>
+    )}
+  </section>
+)}
 
 <article class="page-section panel">
   <div class={bodyClass}>

@@ -23,6 +23,11 @@ const { entry } = Astro.props as Props;
 const { Content } = await render(entry);
 const sectorGraph = await getSectorGraph();
 const { relatedSectors } = resolveAssetSectorContext(sectorGraph.sectors, `/research/${getCollectionSlug(entry)}/`);
+const statusLabelMap: Record<ResearchEntry["data"]["status"], string> = {
+  active: "活跃轨道",
+  seed: "种子轨道",
+  archive: "归档轨道"
+};
 ---
 
 <BaseLayout title={`${entry.data.title} | 研究`} description={entry.data.description} path="/research">
@@ -47,6 +52,14 @@ const { relatedSectors } = resolveAssetSectorContext(sectorGraph.sectors, `/rese
     ]}
     noteTitle="Research Detail"
     note="研究详情页现在承担战区资产说明角色：它不替代战区总览，而是为某条主题线补足完整背景与长期说明。"
+    contextTitle="Carrier Route"
+    contextSummary="这是一份阅读优先的研究卷宗。先用它补足当前主题线的长期背景，再决定是否返回所属战区继续看整体态势。"
+    contextChips={[
+      { label: "研究载体" },
+      { label: statusLabelMap[entry.data.status] },
+      ...relatedSectors.map((sector) => ({ label: sector.title, href: `/sectors/${sector.slug}/` })),
+      { label: entry.data.focus }
+    ]}
   >
     <Content />
   </EntryDetailShell>

@@ -8,66 +8,192 @@ interface Props {
 
 const { entries } = Astro.props as Props;
 const featuredEntries = entries.filter((entry) => entry.data.featured);
+const activeEntries = entries.filter((entry) => entry.data.status === "active").length;
+const seedEntries = entries.filter((entry) => entry.data.status === "seed").length;
+const archiveEntries = entries.filter((entry) => entry.data.status === "archive").length;
+const isSingleTrack = entries.length <= 1;
+
+const orderedEntries = [...entries].sort(
+  (left, right) => Number(right.data.featured) - Number(left.data.featured) || left.data.order - right.data.order
+);
+
+const entrySlots = [
+  { x: 66, y: 32, zone: "primary-core", size: "flagship" },
+  { x: 76, y: 24, zone: "eastern-range", size: "relay" },
+  { x: 76, y: 70, zone: "archive-bank", size: "relay" },
+  { x: 22, y: 28, zone: "method-bank", size: "relay" },
+  { x: 24, y: 72, zone: "southern-scan", size: "relay" },
+  { x: 54, y: 16, zone: "north-orbit", size: "relay" }
+] as const;
+
+const zoneLabels = [
+  { label: "SCAN NORTH", x: 50, y: 12 },
+  { label: "PRIMARY RANGE", x: 49, y: 49 },
+  { label: "METHOD BANK", x: 18, y: 78 },
+  { label: "ARCHIVE BANK", x: 79, y: 78 }
+] as const;
+
+const getFallbackSlot = (index: number) => ({
+  x: 18 + (index % 4) * 18,
+  y: index % 2 === 0 ? 24 : 72,
+  zone: "extended-range",
+  size: "relay" as const
+});
+
+const mapNodes = orderedEntries.map((entry, index) => {
+  const slot = entrySlots[index] ?? getFallbackSlot(index);
+
+  return {
+    entry,
+    ...slot,
+    size: entry.data.featured || index === 0 ? "flagship" : slot.size
+  };
+});
+
+const reserveSlots = entrySlots.slice(mapNodes.length, Math.min(entrySlots.length, mapNodes.length + (isSingleTrack ? 2 : 3)));
+const primaryNode = mapNodes[0];
+
+const getStatusLabel = (status: ResearchEntry["data"]["status"]) => {
+  if (status === "active") {
+    return "活跃轨道";
+  }
+
+  if (status === "seed") {
+    return "种子轨道";
+  }
+
+  return "归档轨道";
+};
+
+const getNodeStyle = (x: number, y: number) => `left:${x}%;top:${y}%;`;
+const getZoneLabelStyle = (x: number, y: number) => `left:${x}%;top:${y}%;`;
+
+const getRouteStyle = (
+  from: { x: number; y: number },
+  to: { x: number; y: number }
+) => {
+  const deltaX = to.x - from.x;
+  const deltaY = to.y - from.y;
+  const length = Math.hypot(deltaX, deltaY);
+  const angle = Math.atan2(deltaY, deltaX);
+
+  return `left:${from.x}%;top:${from.y}%;width:${length}%;transform:translateY(-50%) rotate(${angle}rad);`;
+};
+
+const lastPingLabel = primaryNode?.entry.data.updatedAt
+  ? new Intl.DateTimeFormat("zh-CN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(primaryNode.entry.data.updatedAt)
+  : "待校准";
 ---
 
 <div class="research-view-grid research-view-grid--map">
   <div class="stack">
     <div class="command-note command-note--emphasis">
       <span class="card-kicker">Map Layer</span>
-      <h3>把研究方向看成一张可读的战区版图</h3>
-      <p>地图视图不追求拟真图谱，而是让方向、状态和深入入口在同一眼里变得清楚，像在战术地图里锁定扇区。</p>
+      <h3>把研究方向看成一块正在扫描中的研究战盘</h3>
+      <p>
+        {isSingleTrack
+          ? "这里更像研究战区里的单主线扫描盘：先判断这条主轨道是否仍在推进，再决定是否进入卷宗继续深入。"
+          : "这里不再是普通网格卡片，而是研究战区内的子地图。先看信号热度，再判断哪条轨道值得继续深入。"}
+      </p>
     </div>
 
     <div class="command-note">
-      <span class="card-kicker">Map Legend</span>
+      <span class="card-kicker">Scan Rules</span>
       <ul class="strategy-signal-list">
         <li>
-          <strong>重点扇区</strong>
-          <span>{featuredEntries.length || entries.length}</span>
+          <strong>{isSingleTrack ? "当前态势" : "主目标"}</strong>
+          <span>{isSingleTrack ? "单主线运行" : featuredEntries.length || entries.length}</span>
         </li>
         <li>
           <strong>状态识别</strong>
-          <span>Active / Planned / Prototype</span>
+          <span>Active / Seed / Archive</span>
         </li>
         <li>
           <strong>阅读方式</strong>
-          <span>先看焦点，再进条目</span>
+          <span>先锁定信号，再进卷宗</span>
         </li>
       </ul>
     </div>
   </div>
 
-  <div class="map-board">
-    <div class="map-board__legend">
-      <span>Sector Map</span>
-      <span>{entries.length} 个扇区节点</span>
+  <div class="research-map-board">
+    <div class="research-map-board__legend">
+      <span>Research Scan Map</span>
+      <span>{isSingleTrack ? `${entries.length} 条主轨道信号` : `${entries.length} 条轨道信号`}</span>
     </div>
 
-    <div class="node-grid">
-      {entries.map((entry, index) => (
-        <article
-          class="node-card node-card--sector"
-          data-status={entry.data.status}
-          data-priority={entry.data.featured ? "high" : "normal"}
-        >
-          <div class="node-card__head">
-            <span class="node-card__index">{String(index + 1).padStart(2, "0")}</span>
-            <span class="meta-chip">{entry.data.status}</span>
-          </div>
-          <h3>{entry.data.title}</h3>
-          <p>{entry.data.description}</p>
-          <div class="meta-row">
-            <span class="meta-chip">{entry.data.focus}</span>
-            <span class="meta-chip meta-chip--soft">{entry.data.featured ? "重点轨道" : "持续跟进"}</span>
-          </div>
-          <div class="node-card__footer">
-            <span class="archive-card__source">{entry.data.featured ? "Priority Sector" : "Field Sector"}</span>
-            <a class="node-card__link" href={`/research/${getCollectionSlug(entry)}/`}>
-              查看方向
-            </a>
-          </div>
-        </article>
-      ))}
+    <div class="research-map-board__statusbar">
+      <span>ACTIVE // {activeEntries}</span>
+      <span>SEED // {seedEntries}</span>
+      <span>ARCHIVE // {archiveEntries}</span>
     </div>
+
+    <div class="research-map-board__stage">
+      <div class="research-map-board__terrain" aria-hidden="true">
+        <span class="research-map-board__terrain-band research-map-board__terrain-band--north"></span>
+        <span class="research-map-board__terrain-band research-map-board__terrain-band--center"></span>
+        <span class="research-map-board__terrain-band research-map-board__terrain-band--south"></span>
+        <span class="research-map-board__terrain-ring research-map-board__terrain-ring--alpha"></span>
+        <span class="research-map-board__terrain-ring research-map-board__terrain-ring--beta"></span>
+        <span class="research-map-board__scanline"></span>
+      </div>
+
+      {zoneLabels.map((zone) => (
+        <span class="research-map-zone-label" aria-hidden="true" style={getZoneLabelStyle(zone.x, zone.y)}>
+          {zone.label}
+        </span>
+      ))}
+
+      {primaryNode &&
+        mapNodes.slice(1).map((node) => (
+          <span class="research-map-route" aria-hidden="true" style={getRouteStyle(primaryNode, node)}></span>
+        ))}
+
+      {reserveSlots.map((slot) => (
+        <span class="research-map-ghost" aria-hidden="true" style={getNodeStyle(slot.x, slot.y)}></span>
+      ))}
+
+      {mapNodes.map((node) => (
+        <a
+          class={`research-map-node research-map-node--${node.size}`}
+          href={`/research/${getCollectionSlug(node.entry)}/`}
+          style={getNodeStyle(node.x, node.y)}
+          data-status={node.entry.data.status}
+          data-priority={node.entry.data.featured ? "high" : "normal"}
+          aria-label={`打开研究轨道：${node.entry.data.title}`}
+        >
+          <span class="research-map-node__marker"></span>
+          <span class="research-map-node__plate">
+            <span class="research-map-node__role">{node.entry.data.featured ? "主研究轨道" : "研究轨道"}</span>
+            <strong>{node.entry.data.title}</strong>
+            <span class="research-map-node__focus">{node.entry.data.focus}</span>
+            <span class="research-map-node__status">{getStatusLabel(node.entry.data.status)}</span>
+          </span>
+        </a>
+      ))}
+
+      {primaryNode && (
+        <article class="research-map-brief">
+          <span class="card-kicker">Primary Brief</span>
+          <h3>{primaryNode.entry.data.title}</h3>
+          <p>{primaryNode.entry.data.description}</p>
+          <div class="research-map-brief__meta">
+            <span>{getStatusLabel(primaryNode.entry.data.status)}</span>
+            <span>最近信号 {lastPingLabel}</span>
+            <span>队列 {String(primaryNode.entry.data.order).padStart(2, "0")}</span>
+          </div>
+          <a class="button button--primary" href={`/research/${getCollectionSlug(primaryNode.entry)}/`}>
+            打开主卷宗
+          </a>
+        </article>
+      )}
+    </div>
+    {isSingleTrack && (
+      <p class="research-map-board__footnote">其余坐标当前只保留给未来研究轨道，不参与本轮热度判断。</p>
+    )}
   </div>
 </div>

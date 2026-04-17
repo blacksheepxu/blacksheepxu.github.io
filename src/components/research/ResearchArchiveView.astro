@@ -7,6 +7,7 @@ interface Props {
 }
 
 const { entries } = Astro.props as Props;
+const isSingleTrack = entries.length <= 1;
 ---
 
 <div class="research-view-grid research-view-grid--archive">
@@ -14,15 +15,19 @@ const { entries } = Astro.props as Props;
     <div class="command-note command-note--emphasis">
       <span class="card-kicker">Archive Layer</span>
       <h3>把研究条目当作情报卷宗来浏览</h3>
-      <p>档案视图更适合按焦点、状态和优先级去理解每条研究轨道的角色，而不是单纯顺着卡片列表往下读。</p>
+      <p>
+        {isSingleTrack
+          ? "当前只有 1 份主卷宗，因此档案层更像直接阅读入口，用来确认这条研究线的角色，而不是铺成一整面索引墙。"
+          : "档案视图更适合按焦点、状态和优先级去理解每条研究轨道的角色，而不是单纯顺着卡片列表往下读。"}
+      </p>
     </div>
 
     <div class="command-note">
       <span class="card-kicker">File Rules</span>
       <ul class="strategy-signal-list">
         <li>
-          <strong>优先级</strong>
-          <span>Featured 轨道优先展开</span>
+          <strong>{isSingleTrack ? "当前数量" : "优先级"}</strong>
+          <span>{isSingleTrack ? "1 份主卷宗" : "Featured 轨道优先展开"}</span>
         </li>
         <li>
           <strong>状态</strong>

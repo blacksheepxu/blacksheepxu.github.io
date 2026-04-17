@@ -29,6 +29,11 @@ const posts = await getPosts();
 const stats = buildSiteStats(posts);
 const sectorGraph = await getSectorGraph();
 const { relatedSectors } = resolveAssetSectorContext(sectorGraph.sectors, `/lab/${getCollectionSlug(entry)}/`);
+const statusLabelMap: Record<LabEntry["data"]["status"], string> = {
+  ready: "可直接查看",
+  prototype: "原型阶段",
+  planned: "计划阶段"
+};
 ---
 
 <BaseLayout title={`${entry.data.title} | 实验`} description={entry.data.description} path="/lab">
@@ -53,6 +58,14 @@ const { relatedSectors } = resolveAssetSectorContext(sectorGraph.sectors, `/lab/
     ]}
     noteTitle="Lab Detail"
     note="实验详情页作为战区资产的一种特殊表面存在：它负责展示交互表达与验证方式，而不替代战区层的总控语义。"
+    contextTitle="Carrier Route"
+    contextSummary="这是一份阅读与体验优先的实验卷宗。当前实验载体更像战区内的验证入口，而不是独立实验平台。"
+    contextChips={[
+      { label: "实验载体" },
+      { label: statusLabelMap[entry.data.status] },
+      ...relatedSectors.map((sector) => ({ label: sector.title, href: `/sectors/${sector.slug}/` })),
+      { label: entry.data.kind }
+    ]}
   >
     <Content />
   </EntryDetailShell>
