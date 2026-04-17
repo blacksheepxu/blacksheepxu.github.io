@@ -5,6 +5,7 @@ import Header from "../components/site/Header.astro";
 import Footer from "../components/site/Footer.astro";
 import MathRenderer from "../components/site/MathRenderer.astro";
 import { siteMeta } from "../data/site";
+import { defaultTheme, defaultThemeId, themeRegistry } from "../lib/theme/theme-registry";
 
 interface NavItem {
   href: string;
@@ -30,6 +31,108 @@ const {
     { href: "/about", label: "关于" }
   ]
 } = Astro.props;
+
+const themeInitScript = `
+(() => {
+  const root = document.documentElement;
+  const storageKey = ${JSON.stringify(siteMeta.themeStorageKey)};
+  const defaultTheme = ${JSON.stringify(defaultThemeId)};
+  const registry = ${JSON.stringify(themeRegistry)};
+  const themeIds = registry.map((theme) => theme.id);
+  const getThemeMeta = (themeId) => registry.find((theme) => theme.id === themeId) ?? registry.find((theme) => theme.id === defaultTheme) ?? registry[0];
+
+  let theme = defaultTheme;
+
+  try {
+    const stored = window.localStorage.getItem(storageKey);
+    if (themeIds.includes(stored)) {
+      theme = stored;
+    }
+  } catch {
+    theme = defaultTheme;
+  }
+
+  const themeMeta = getThemeMeta(theme);
+  root.dataset.theme = theme;
+  root.dataset.themeCapability = themeMeta.capability;
+})();
+`;
+
+const themeControllerScript = `
+(() => {
+  const root = document.documentElement;
+  const storageKey = ${JSON.stringify(siteMeta.themeStorageKey)};
+  const defaultTheme = ${JSON.stringify(defaultThemeId)};
+  const defaultCapability = ${JSON.stringify(defaultTheme.capability)};
+  const registry = ${JSON.stringify(themeRegistry)};
+  const getThemeMeta = (themeId) => registry.find((theme) => theme.id === themeId) ?? registry.find((theme) => theme.id === defaultTheme) ?? registry[0];
+  const getNextThemeId = (themeId) => {
+    const currentIndex = registry.findIndex((theme) => theme.id === themeId);
+
+    if (currentIndex === -1) {
+      return defaultTheme;
+    }
+
+    return registry[(currentIndex + 1) % registry.length].id;
+  };
+
+  const syncButtons = (theme) => {
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+      const themeMeta = getThemeMeta(theme);
+      const isCommandTheme = themeMeta.capability !== defaultCapability;
+      button.setAttribute("aria-pressed", String(isCommandTheme));
+      button.dataset.themeState = themeMeta.id;
+      button.dataset.themeCapability = themeMeta.capability;
+
+      const label = button.querySelector("[data-theme-toggle-label]");
+      const state = button.querySelector("[data-theme-toggle-state]");
+
+      if (label) {
+        label.textContent = "主题";
+      }
+
+      if (state) {
+        state.textContent = themeMeta.shortLabel;
+      }
+    });
+  };
+
+  const applyTheme = (theme, persist) => {
+    const themeMeta = getThemeMeta(theme);
+    root.dataset.theme = themeMeta.id;
+    root.dataset.themeCapability = themeMeta.capability;
+    syncButtons(themeMeta.id);
+
+    if (!persist) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(storageKey, themeMeta.id);
+    } catch {}
+  };
+
+  const currentTheme = getThemeMeta(root.dataset.theme).id;
+  applyTheme(currentTheme, false);
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const button = target.closest("[data-theme-toggle]");
+
+    if (!(button instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const nextTheme = getNextThemeId(root.dataset.theme);
+    applyTheme(nextTheme, true);
+  });
+})();
+`;
 ---
 
 <!doctype html>
@@ -39,6 +142,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <script is:inline set:html={themeInitScript}></script>
   </head>
   <body>
     <div class="site-frame">
@@ -49,5 +153,6 @@ const {
       <Footer />
     </div>
     <MathRenderer />
+    <script is:inline set:html={themeControllerScript}></script>
   </body>
 </html>

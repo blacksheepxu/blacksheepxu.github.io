@@ -17,7 +17,8 @@ test("taxonomy routes stay accessible", async ({ page }) => {
 test("blog archive highlights writing inventory", async ({ page }) => {
   await page.goto("/blog/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("博客");
-  await expect(page.getByText("文章总数")).toBeVisible();
+  await expect(page.getByText("Archive Status Board")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "重点卷宗" })).toBeVisible();
   await expect(page.getByRole("link", { name: "打开文章" }).first()).toBeVisible();
 });
 
@@ -32,6 +33,14 @@ test("research detail page uses unified detail shell", async ({ page }) => {
   await page.goto("/research/ai-research-station/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("当前研究版图");
   await expect(page.locator(".channel-metric").filter({ hasText: "研究焦点" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "自研项目推进" })).toBeVisible();
+});
+
+test("blog detail page uses dossier-style article shell", async ({ page }) => {
+  await page.goto("/2020/02/01/Pytorch-1-Tensor%E6%98%AF%E4%BB%80%E4%B9%88/");
+  await expect(page.getByText("Article Brief")).toBeVisible();
+  await expect(page.getByText("关联路径")).toBeVisible();
+  await expect(page.getByRole("link", { name: "AI 工具侦察" })).toBeVisible();
 });
 
 test("lab page presents interaction entries", async ({ page }) => {
@@ -45,6 +54,7 @@ test("lab detail page uses unified detail shell", async ({ page }) => {
   await page.goto("/lab/research-cadence-demo/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("研究节奏与主题投入");
   await expect(page.locator(".channel-metric").filter({ hasText: "实验类型" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "自研项目推进" })).toBeVisible();
 });
 
 test("about page explains site structure", async ({ page }) => {

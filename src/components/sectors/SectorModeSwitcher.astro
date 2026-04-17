@@ -1,0 +1,97 @@
+---
+import type { ThemeSector } from "../../lib/theme-sectors/sector-graph";
+import SectorOverviewPanel from "./SectorOverviewPanel.astro";
+import SectorAssetsView from "./SectorAssetsView.astro";
+import SectorTimelineView from "./SectorTimelineView.astro";
+
+interface Props {
+  sector: ThemeSector;
+}
+
+const { sector } = Astro.props as Props;
+---
+
+<section class="research-console panel">
+  <div class="sector-deck__masthead">
+    <div class="research-console__copy sector-deck__copy">
+      <div class="article-path">
+        <a href="/">首页</a>
+        <span>/</span>
+        <a href="/">战区总控</a>
+        <span>/</span>
+        <span>{sector.title}</span>
+      </div>
+      <span class="eyebrow eyebrow--muted">Sector Command Views</span>
+      <div class="command-board__status">
+        <span class="status-pill status-pill--accent">战区总览</span>
+        <span class="status-pill">{sector.assetCount} 项资产</span>
+        <span class="status-pill">{sector.dominantTopic}</span>
+      </div>
+      <h2>{sector.title}</h2>
+      <p>{sector.summary}</p>
+    </div>
+
+    <aside class="sector-deck__aside">
+      <div class="sector-ledger-card sector-ledger-card--primary">
+        <span class="card-kicker">Command Focus</span>
+        <strong>{sector.title}</strong>
+        <p>这里是进入单一战区后的作战室，不再展示全局网络，而是聚焦当前主题的态势、资产和推进节奏。</p>
+      </div>
+      <div class="sector-ledger-card">
+        <span class="card-kicker">Carrier Mix</span>
+        <strong>{sector.assets.length}</strong>
+        <p>同一战区内的 blog / research / lab 资产会被统一理解，而不是分频道阅读。</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="mode-shell sector-deck__modes" data-mode-shell data-mode-default="overview">
+    <div class="mode-switcher" aria-label="战区视图切换">
+      <button type="button" data-mode-trigger="overview" aria-pressed="true">总览</button>
+      <button type="button" data-mode-trigger="assets" aria-pressed="false">资产部署</button>
+      <button type="button" data-mode-trigger="timeline" aria-pressed="false">时间推进</button>
+    </div>
+
+    <div class="mode-panel" data-mode-panel="overview">
+      <SectorOverviewPanel sector={sector} />
+    </div>
+
+    <div class="mode-panel" data-mode-panel="assets" hidden>
+      <SectorAssetsView sector={sector} />
+    </div>
+
+    <div class="mode-panel" data-mode-panel="timeline" hidden>
+      <SectorTimelineView sector={sector} />
+    </div>
+  </div>
+</section>
+
+<script>
+  const syncModeShell = (shell: HTMLElement) => {
+    const buttons = shell.querySelectorAll<HTMLButtonElement>("[data-mode-trigger]");
+    const panels = shell.querySelectorAll<HTMLElement>("[data-mode-panel]");
+
+    const applyMode = (mode?: string) => {
+      buttons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.modeTrigger === mode));
+      });
+
+      panels.forEach((panel) => {
+        panel.hidden = panel.dataset.modePanel !== mode;
+      });
+    };
+
+    const defaultMode = shell.dataset.modeDefault || buttons[0]?.dataset.modeTrigger;
+    applyMode(defaultMode);
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        applyMode(button.dataset.modeTrigger);
+      });
+    });
+  };
+
+  document.querySelectorAll<HTMLElement>("[data-mode-shell]").forEach((shell) => {
+    syncModeShell(shell);
+  });
+</script>

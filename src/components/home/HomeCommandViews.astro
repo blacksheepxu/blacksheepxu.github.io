@@ -1,0 +1,136 @@
+---
+import type { SectorGraph, ThemeSector } from "../../lib/theme-sectors/sector-graph";
+import { buildSectorHomeLayout } from "../../lib/theme-sectors/sector-presenters";
+import SectorCommandNetwork from "./SectorCommandNetwork.astro";
+import SectorInspectorPanel from "./SectorInspectorPanel.astro";
+
+interface Props {
+  graph: SectorGraph;
+}
+
+const { graph } = Astro.props as Props;
+const layout = buildSectorHomeLayout(graph.sectors);
+const orderedSectors: ThemeSector[] = [
+  layout.primarySector,
+  ...layout.supportSectors,
+  layout.dynamicSector,
+  ...layout.peripheralSectors
+];
+const tickerMessages = [
+  `PRIMARY // ${layout.primarySector.title}`,
+  `SUPPORT // ${layout.supportSectors[0]?.title ?? "待命"}`,
+  `CALIBRATION // ${layout.supportSectors[1]?.title ?? "待命"}`,
+  `DYNAMIC SLOT // ${layout.dynamicSector.title}`,
+  `PERIPHERAL COUNT // ${layout.peripheralSectors.length}`
+];
+---
+
+<section class="command-board panel theme-shell--command sector-command sector-command--overhauled">
+  <div class="sector-command__masthead">
+    <div class="sector-command__hero">
+      <div class="article-path">
+        <a href="/">首页</a>
+        <span>/</span>
+        <span>战区总控</span>
+      </div>
+      <span class="eyebrow eyebrow--muted">Sector Command Deck</span>
+      <div class="command-board__status">
+        <span class="status-pill status-pill--accent">总控甲板在线</span>
+        <span class="status-pill">3 核心战区</span>
+        <span class="status-pill status-pill--alert">1 机动补位</span>
+      </div>
+      <h1>先看战区网络，再下达内容调度。</h1>
+      <p>
+        这里不是频道目录，而是一块作战甲板。你先判断主题之间的牵引关系，再锁定当前战区，最后调度 blog、research 和 lab 这些资产载体。
+      </p>
+      <div class="hero-actions">
+        <a class="button button--primary" href={`/sectors/${layout.primarySector.slug}/`}>进入总主战区</a>
+        <a class="button" href="/update">查看维护入口</a>
+      </div>
+    </div>
+
+    <aside class="sector-command__ledger">
+      <article class="sector-ledger-card sector-ledger-card--primary">
+        <span class="card-kicker">Primary Theater</span>
+        <strong>{layout.primarySector.title}</strong>
+        <p>{layout.primarySector.summary}</p>
+      </article>
+      <article class="sector-ledger-card">
+        <span class="card-kicker">Command Load</span>
+        <strong>{graph.sectors.reduce((total, sector) => total + sector.assetCount, 0)}</strong>
+        <p>当前总资产数，覆盖 posts / research / lab 三类载体。</p>
+      </article>
+      <article class="sector-ledger-card">
+        <span class="card-kicker">Peripheral Spread</span>
+        <strong>{layout.peripheralSectors.length}</strong>
+        <p>外围散点保留版图完整感，不参与中心区主叙事竞争。</p>
+      </article>
+    </aside>
+  </div>
+
+  <div class="sector-command__ticker" aria-hidden="true">
+    <div class="sector-command__ticker-track">
+      {[...tickerMessages, ...tickerMessages].map((message) => (
+        <span>{message}</span>
+      ))}
+    </div>
+  </div>
+
+  <div class="sector-command__operations" data-sector-focus-shell data-sector-default={graph.defaultFocusedSlug}>
+    <SectorCommandNetwork layout={layout} defaultFocusedSlug={graph.defaultFocusedSlug} />
+
+    <div class="sector-command__briefing">
+      <SectorInspectorPanel sectors={orderedSectors} defaultFocusedSlug={graph.defaultFocusedSlug} />
+
+      <div class="sector-command__protocol">
+        <span class="card-kicker">指挥协议</span>
+        <ul class="strategy-signal-list">
+          <li>
+            <strong>第一步</strong>
+            <span>先在战术沙盘上锁定一个战区</span>
+          </li>
+          <li>
+            <strong>第二步</strong>
+            <span>阅读下方战区简报，确认热度与载体结构</span>
+          </li>
+          <li>
+            <strong>第三步</strong>
+            <span>只在确认后进入该战区页继续选资产</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const syncSectorShell = (shell: HTMLElement) => {
+    const buttons = shell.querySelectorAll<HTMLButtonElement>("[data-sector-trigger]");
+    const panels = shell.querySelectorAll<HTMLElement>("[data-sector-panel]");
+
+    const applyFocus = (slug?: string) => {
+      buttons.forEach((button) => {
+        const focused = button.dataset.sectorTrigger === slug;
+        button.dataset.focused = String(focused);
+        button.setAttribute("aria-pressed", String(focused));
+      });
+
+      panels.forEach((panel) => {
+        panel.hidden = panel.dataset.sectorPanel !== slug;
+      });
+    };
+
+    const defaultSlug = shell.dataset.sectorDefault || buttons[0]?.dataset.sectorTrigger;
+    applyFocus(defaultSlug);
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        applyFocus(button.dataset.sectorTrigger);
+      });
+    });
+  };
+
+  document.querySelectorAll<HTMLElement>("[data-sector-focus-shell]").forEach((shell) => {
+    syncSectorShell(shell);
+  });
+</script>

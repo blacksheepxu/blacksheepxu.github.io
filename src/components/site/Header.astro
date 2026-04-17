@@ -19,14 +19,27 @@ const { path, nav } = Astro.props;
     <div class="site-title">
       <a href="/">{siteMeta.title}</a>
     </div>
-    <nav class="site-nav" aria-label="站点导航">
-      {
-        nav.map((item) => (
-          <a href={item.href} aria-current={path === item.href ? "page" : undefined}>
-            {item.label}
-          </a>
-        ))
-      }
-    </nav>
+    <div class="site-nav-group">
+      <nav class="site-nav" aria-label="站点导航">
+        {
+          nav.map((item) => (
+            <a href={item.href} aria-current={path === item.href ? "page" : undefined}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        aria-pressed="false"
+        aria-label="切换站点主题"
+      >
+        <span class="theme-toggle__label" data-theme-toggle-label>主题</span>
+        <span class="theme-toggle__state" data-theme-toggle-state>默认</span>
+      </button>
+    </div>
   </div>
 </header>

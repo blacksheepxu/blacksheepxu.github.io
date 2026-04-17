@@ -1,0 +1,32 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SectorModeSwitcher from "../../components/sectors/SectorModeSwitcher.astro";
+import { getSectorGraph } from "../../lib/theme-sectors/get-sector-graph";
+import { siteMeta } from "../../data/site";
+
+interface Props {
+  slug: string;
+}
+
+export const getStaticPaths = (async () => {
+  const graph = await getSectorGraph();
+
+  return graph.sectors.map((sector) => ({
+    params: { slug: sector.slug },
+    props: { slug: sector.slug }
+  }));
+}) satisfies GetStaticPaths;
+
+const { slug } = Astro.props as Props;
+const graph = await getSectorGraph();
+const sector = graph.sectors.find((entry) => entry.slug === slug);
+
+if (!sector) {
+  throw new Error(`Missing sector for slug: ${slug}`);
+}
+---
+
+<BaseLayout title={`${sector.title} | ${siteMeta.title}`} description={sector.summary} path={`/sectors/${sector.slug}`}>
+  <SectorModeSwitcher sector={sector} />
+</BaseLayout>

@@ -1,0 +1,125 @@
+---
+import type {
+  SectorHomeLayout,
+  SectorMapNode,
+  SectorMapRoute
+} from "../../lib/theme-sectors/sector-presenters";
+import { buildSectorMapLayout, getSectorHeatLabel } from "../../lib/theme-sectors/sector-presenters";
+
+interface Props {
+  layout: SectorHomeLayout;
+  defaultFocusedSlug: string;
+}
+
+const { layout, defaultFocusedSlug } = Astro.props as Props;
+const activeSignals =
+  layout.dynamicSector.recentActivity +
+  layout.primarySector.recentActivity +
+  layout.supportSectors.reduce((total, sector) => total + sector.recentActivity, 0);
+const mapLayout = buildSectorMapLayout(layout);
+
+const getNodeRoleLabel = (node: SectorMapNode) => {
+  if (node.sector.role === "primary") {
+    return "总主战区";
+  }
+
+  if (node.sector.role === "support") {
+    return "支援战区";
+  }
+
+  if (node.sector.role === "calibration") {
+    return "校准战区";
+  }
+
+  if (node.sector.role === "dynamic") {
+    return "机动补位";
+  }
+
+  return "外围散点";
+};
+
+const getRouteStyle = (route: SectorMapRoute) => {
+  const deltaX = route.to.x - route.from.x;
+  const deltaY = route.to.y - route.from.y;
+  const length = Math.hypot(deltaX, deltaY);
+  const angle = Math.atan2(deltaY, deltaX);
+
+  return `left:${route.from.x}%;top:${route.from.y}%;width:${length}%;transform:translateY(-50%) rotate(${angle}rad);`;
+};
+
+const getNodeStyle = (node: SectorMapNode) => `left:${node.x}%;top:${node.y}%;`;
+const getZoneLabelStyle = (x: number, y: number) => `left:${x}%;top:${y}%;`;
+---
+
+<div class="sector-network">
+  <div class="sector-network__head">
+    <div>
+      <span class="card-kicker">Theme Sector Network</span>
+      <h2>当前主题战区版图</h2>
+      <p>这次首页不再只是抽象沙盘，而是一张真正的战术地图。固定战区保持稳定坐标，动态战区在预设补位区活动，颜色直接暴露热度。</p>
+    </div>
+
+    <div class="sector-network__legend">
+      <span class="sector-legend-chip">固定核心坐标稳定</span>
+      <span class="sector-legend-chip">机动战区仅在预设区补位</span>
+      <span class="sector-legend-chip">节点颜色映射热度</span>
+    </div>
+  </div>
+
+  <div class="sector-network__stage">
+    <div class="sector-network__terrain" aria-hidden="true">
+      <span class="sector-network__terrain-band sector-network__terrain-band--north"></span>
+      <span class="sector-network__terrain-band sector-network__terrain-band--center"></span>
+      <span class="sector-network__terrain-band sector-network__terrain-band--south"></span>
+      <span class="sector-network__terrain-ring sector-network__terrain-ring--alpha"></span>
+      <span class="sector-network__terrain-ring sector-network__terrain-ring--beta"></span>
+    </div>
+
+    <div class="sector-network__statusbar">
+      <span>MAP SCALE // CONTENT THEMES</span>
+      <span>PRIMARY LOCK // {layout.primarySector.title}</span>
+      <span>ACTIVE SIGNALS // {activeSignals}</span>
+    </div>
+
+    <div class="sector-network__arena">
+      {mapLayout.zoneLabels.map((zone) => (
+        <span class="sector-map-zone-label" aria-hidden="true" style={getZoneLabelStyle(zone.x, zone.y)}>
+          {zone.label}
+        </span>
+      ))}
+
+      {mapLayout.routes.map((route) => (
+        <span
+          class={`sector-map-route sector-map-route--${route.emphasis}`}
+          aria-hidden="true"
+          style={getRouteStyle(route)}
+        ></span>
+      ))}
+
+      {mapLayout.nodes.map((node) => (
+        <button
+          class={`sector-map-node sector-map-node--${node.size}`}
+          type="button"
+          data-sector-trigger={node.sector.slug}
+          data-focused={String(node.sector.slug === defaultFocusedSlug)}
+          data-heat-band={node.heatBand}
+          data-map-zone={node.zone}
+          data-anchor-kind={node.anchorKind}
+          aria-pressed={node.sector.slug === defaultFocusedSlug}
+          style={getNodeStyle(node)}
+        >
+          <span class="sector-map-node__marker"></span>
+          <div class="sector-map-node__plate">
+            <span class="sector-map-node__role">{getNodeRoleLabel(node)}</span>
+            <div class="sector-map-node__head">
+              <strong class="sector-map-node__title">{node.sector.title}</strong>
+              <span class="sector-map-node__heat">{getSectorHeatLabel(node.sector)}</span>
+            </div>
+            <span class="sector-map-node__meta">{node.sector.assetCount} 项资产 · {node.sector.dominantTopic}</span>
+            {node.anchorKind !== "peripheral" && <p class="sector-map-node__summary">{node.sector.summary}</p>}
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+</div>

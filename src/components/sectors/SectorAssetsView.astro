@@ -1,0 +1,35 @@
+---
+import type { ThemeSector } from "../../lib/theme-sectors/sector-graph";
+
+interface Props {
+  sector: ThemeSector;
+}
+
+const { sector } = Astro.props as Props;
+---
+
+<div class="archive-grid archive-grid--records">
+  {sector.assets.map((asset, index) => (
+    <article class={`content-card archive-card ${index === 0 ? "archive-card--priority" : "archive-card--record"}`}>
+      <div class="archive-card__head">
+        <span class="archive-card__stamp">{asset.kind.toUpperCase()}</span>
+        <span class="meta-chip">{asset.signalLabel}</span>
+      </div>
+      <h3 class="archive-card__title">
+        <a href={asset.href}>{asset.title}</a>
+      </h3>
+      <p class="archive-card__summary">{asset.description}</p>
+      <div class="meta-row">
+        {asset.topics.slice(0, 3).map((topic) => (
+          <span class="meta-chip meta-chip--soft">{topic}</span>
+        ))}
+      </div>
+      <div class="archive-card__footer">
+        <span class="archive-card__source">{asset.kind}</span>
+        <a class="archive-card__link" href={asset.href}>
+          打开资产
+        </a>
+      </div>
+    </article>
+  ))}
+</div>

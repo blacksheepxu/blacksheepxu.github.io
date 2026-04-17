@@ -1,0 +1,47 @@
+---
+import type { ThemeSector } from "../../lib/theme-sectors/sector-graph";
+import { getSectorHeatLabel } from "../../lib/theme-sectors/sector-presenters";
+
+interface Props {
+  sector: ThemeSector;
+}
+
+const { sector } = Astro.props as Props;
+---
+
+<div class="stack">
+  <div class="command-note command-note--emphasis">
+    <span class="card-kicker">Sector Overview</span>
+    <h3>{sector.title}</h3>
+    <p>{sector.summary}</p>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <strong>{sector.assetCount}</strong>
+      <span>资产总量</span>
+    </div>
+    <div class="metric-card">
+      <strong>{sector.recentActivity}</strong>
+      <span>近期活跃</span>
+    </div>
+    <div class="metric-card">
+      <strong>{getSectorHeatLabel(sector)}</strong>
+      <span>当前热度</span>
+    </div>
+  </div>
+
+  <div class="command-note">
+    <span class="card-kicker">Lead Assets</span>
+    <ul class="strategy-signal-list">
+      {sector.leadAssets.map((asset) => (
+        <li>
+          <strong>
+            <a href={asset.href}>{asset.title}</a>
+          </strong>
+          <span>{asset.signalLabel}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
