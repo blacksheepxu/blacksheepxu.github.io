@@ -81,7 +81,7 @@ test("research page switches between map archive and timeline in strategy theme"
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "strategy");
   await expect(page.locator("html")).toHaveAttribute("data-theme-capability", "command");
-  await expect(page.getByText("把研究方向看成一张可读的战区版图")).toBeVisible();
+  await expect(page.getByText("把研究方向看成一块正在扫描中的研究战盘")).toBeVisible();
 
   await page.getByRole("button", { name: "档案" }).click();
   await expect(page.getByText("把研究条目当作情报卷宗来浏览")).toBeVisible();
