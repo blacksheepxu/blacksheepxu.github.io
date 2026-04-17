@@ -11,9 +11,11 @@ interface Props {
 
 const { entries, posts } = Astro.props as Props;
 const activeEntries = entries.filter((entry) => entry.data.status === "active").length;
+const featuredEntry = entries.find((entry) => entry.data.featured) ?? entries[0];
+const isSingleTrack = entries.length <= 1;
 ---
 
-<section class="research-console panel theme-shell--command">
+<section class="research-console panel theme-shell--command" data-track-density={isSingleTrack ? "single" : "cluster"}>
   <div class="research-console__grid">
     <div class="research-console__copy">
       <div class="article-path">
@@ -23,28 +25,40 @@ const activeEntries = entries.filter((entry) => entry.data.status === "active").
         <span>/</span>
         <span>策略视图</span>
       </div>
-      <span class="eyebrow eyebrow--muted">Research Command Views</span>
+      <span class="eyebrow eyebrow--muted">Research Carrier Views</span>
       <div class="command-board__status">
-        <span class="status-pill status-pill--accent">战区地图就绪</span>
-        <span class="status-pill">卷宗索引同步</span>
-        <span class="status-pill status-pill--alert">近期轨迹可回放</span>
+        <span class="status-pill status-pill--accent">{isSingleTrack ? "主轨道在场" : "研究地图就绪"}</span>
+        <span class="status-pill">{isSingleTrack ? "载体语义收束" : "卷宗索引同步"}</span>
+        <span class="status-pill status-pill--alert">{isSingleTrack ? "轨迹可回看" : "近期轨迹可回放"}</span>
       </div>
-      <h2>像看战区态势一样看研究版图。</h2>
-      <p>研究页在策略主题下不只是列表页，而是允许你从方向分布、卷宗索引和时间轨迹三个维度切换理解同一批内容。</p>
+      <h2>{isSingleTrack ? "研究载体，当前先承载一条主线。" : "像看战区态势一样看研究版图。"}</h2>
+      <p>
+        {
+          isSingleTrack
+            ? "研究页在策略主题下仍然是载体页，而不是独立战区。当前只有一条主轨道时，它更像一块子地图，用来说明这条研究线的角色、入口和最近推进。"
+            : "研究页在策略主题下不只是列表页，而是允许你从方向分布、卷宗索引和时间轨迹三个维度切换理解同一批内容。"
+        }
+      </p>
     </div>
 
     <aside class="research-console__sidebar">
       <div class="research-console__summary">
         <strong>Research Brief</strong>
-        <p>先判断哪些方向仍在推进，再决定是看结构层、看卷宗层，还是直接回看最近的内容增长。</p>
+        <p>
+          {
+            isSingleTrack
+              ? "当前只有一条主轨道，因此这层更多是在说明研究载体的角色与入口，而不是假装已经形成一整片研究战区。"
+              : "先判断哪些方向仍在推进，再决定是看结构层、看卷宗层，还是直接回看最近的内容增长。"
+          }
+        </p>
         <ul class="strategy-signal-list strategy-signal-list--compact">
           <li>
-            <strong>当前主战区</strong>
-            <span>{entries.find((entry) => entry.data.featured)?.data.focus ?? "研究地图"}</span>
+            <strong>{isSingleTrack ? "当前主轨道" : "当前主战区"}</strong>
+            <span>{featuredEntry?.data.focus ?? "研究地图"}</span>
           </li>
           <li>
-            <strong>活跃信号</strong>
-            <span>{activeEntries} / {entries.length}</span>
+            <strong>{isSingleTrack ? "载体形态" : "活跃信号"}</strong>
+            <span>{isSingleTrack ? "紧凑子地图" : `${activeEntries} / ${entries.length}`}</span>
           </li>
         </ul>
       </div>
@@ -52,7 +66,7 @@ const activeEntries = entries.filter((entry) => entry.data.status === "active").
       <div class="metric-grid">
         <div class="metric-card">
           <strong>{entries.length}</strong>
-          <span>研究轨道</span>
+          <span>{isSingleTrack ? "当前轨道" : "研究轨道"}</span>
         </div>
         <div class="metric-card">
           <strong>{activeEntries}</strong>
@@ -86,7 +100,11 @@ const activeEntries = entries.filter((entry) => entry.data.status === "active").
         <div class="command-note command-note--emphasis">
           <span class="card-kicker">Timeline Layer</span>
           <h3>按最近推进记录回放研究节奏</h3>
-          <p>轨迹视图保留时间维度，帮助你快速判断最近有哪些方向真的在被推进，而不只是停留在计划层。</p>
+          <p>
+            {isSingleTrack
+              ? "轨迹视图在当前阶段主要用于判断这一条研究线是否真的仍在被推进，而不是把少量内容伪装成完整的时间战场。"
+              : "轨迹视图保留时间维度，帮助你快速判断最近有哪些方向真的在被推进，而不只是停留在计划层。"}
+          </p>
         </div>
         <ResearchTimeline posts={posts} />
       </div>

@@ -22,7 +22,7 @@ const carrierSectors = getCarrierSectors(sectorGraph.sectors, "lab");
     pathLabel="实验"
     eyebrow="Interaction Layer"
     title="实验"
-    summary="这里是主题战区下的实验资产载体，用来承接图表、交互表达和展示型验证入口。"
+    summary="这里是主题战区下的实验资产载体，当前优先承接少量重点交互入口，而不是扩成独立实验产品区。"
     chips={[
       ...carrierSectors.map((sector) => ({ label: sector.title, href: `/sectors/${sector.slug}/` })),
       ...entries.map((entry) => ({ label: entry.data.kind, href: `/lab/${getCollectionSlug(entry)}/` }))
@@ -34,16 +34,21 @@ const carrierSectors = getCarrierSectors(sectorGraph.sectors, "lab");
       { label: "展示原型", value: entries.length - statsCount }
     ]}
     noteTitle="Lab Note"
-    note="实验页现在服务于战区表达：它不是独立产品区，而是帮助某个主题战区把结果、节奏和验证方式展示得更清楚。"
+    note="实验页在策略主题下是紧凑载体层：当前更适合直接进入重点实验，而不是先建立一整套实验战区。"
   />
 
   <section class="page-section panel">
     <div class="section-head">
       <div>
-        <h2>实验入口</h2>
-        <p>优先放那些确实适合用交互、图表或切换态来解释的内容。</p>
+        <h2>当前实验入口</h2>
+        <p>优先保留少量真正值得直接打开的交互表达，而不是先铺大实验阵地。</p>
       </div>
     </div>
+    <article class="command-note command-note--emphasis">
+      <span class="card-kicker">Carrier Brief</span>
+      <h3>实验页先做紧凑验证入口，不假装它已经是独立中控区。</h3>
+      <p>当前只有少量实验条目时，最合适的动作是直接进入重点实验；策略主题在这里负责说明载体角色，而不是制造比内容更厚的系统壳层。</p>
+    </article>
     <div class="card-grid">
       {entries.map((entry: LabEntry) => (
         <article class="content-card content-card--signal">

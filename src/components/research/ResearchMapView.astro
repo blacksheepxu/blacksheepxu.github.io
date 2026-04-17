@@ -11,6 +11,7 @@ const featuredEntries = entries.filter((entry) => entry.data.featured);
 const activeEntries = entries.filter((entry) => entry.data.status === "active").length;
 const seedEntries = entries.filter((entry) => entry.data.status === "seed").length;
 const archiveEntries = entries.filter((entry) => entry.data.status === "archive").length;
+const isSingleTrack = entries.length <= 1;
 
 const orderedEntries = [...entries].sort(
   (left, right) => Number(right.data.featured) - Number(left.data.featured) || left.data.order - right.data.order
@@ -49,7 +50,7 @@ const mapNodes = orderedEntries.map((entry, index) => {
   };
 });
 
-const reserveSlots = entrySlots.slice(mapNodes.length, Math.min(entrySlots.length, mapNodes.length + 3));
+const reserveSlots = entrySlots.slice(mapNodes.length, Math.min(entrySlots.length, mapNodes.length + (isSingleTrack ? 2 : 3)));
 const primaryNode = mapNodes[0];
 
 const getStatusLabel = (status: ResearchEntry["data"]["status"]) => {
@@ -93,15 +94,19 @@ const lastPingLabel = primaryNode?.entry.data.updatedAt
     <div class="command-note command-note--emphasis">
       <span class="card-kicker">Map Layer</span>
       <h3>把研究方向看成一块正在扫描中的研究战盘</h3>
-      <p>这里不再是普通网格卡片，而是研究战区内的子地图。先看信号热度，再判断哪条轨道值得继续深入。</p>
+      <p>
+        {isSingleTrack
+          ? "这里更像研究战区里的单主线扫描盘：先判断这条主轨道是否仍在推进，再决定是否进入卷宗继续深入。"
+          : "这里不再是普通网格卡片，而是研究战区内的子地图。先看信号热度，再判断哪条轨道值得继续深入。"}
+      </p>
     </div>
 
     <div class="command-note">
       <span class="card-kicker">Scan Rules</span>
       <ul class="strategy-signal-list">
         <li>
-          <strong>主目标</strong>
-          <span>{featuredEntries.length || entries.length}</span>
+          <strong>{isSingleTrack ? "当前态势" : "主目标"}</strong>
+          <span>{isSingleTrack ? "单主线运行" : featuredEntries.length || entries.length}</span>
         </li>
         <li>
           <strong>状态识别</strong>
@@ -118,7 +123,7 @@ const lastPingLabel = primaryNode?.entry.data.updatedAt
   <div class="research-map-board">
     <div class="research-map-board__legend">
       <span>Research Scan Map</span>
-      <span>{entries.length} 条轨道信号</span>
+      <span>{isSingleTrack ? `${entries.length} 条主轨道信号` : `${entries.length} 条轨道信号`}</span>
     </div>
 
     <div class="research-map-board__statusbar">
@@ -187,5 +192,8 @@ const lastPingLabel = primaryNode?.entry.data.updatedAt
         </article>
       )}
     </div>
+    {isSingleTrack && (
+      <p class="research-map-board__footnote">其余坐标当前只保留给未来研究轨道，不参与本轮热度判断。</p>
+    )}
   </div>
 </div>

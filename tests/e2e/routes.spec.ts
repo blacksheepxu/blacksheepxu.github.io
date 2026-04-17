@@ -33,7 +33,9 @@ test("research detail page uses unified detail shell", async ({ page }) => {
   await page.goto("/research/ai-research-station/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("当前研究版图");
   await expect(page.locator(".channel-metric").filter({ hasText: "研究焦点" }).first()).toBeVisible();
-  await expect(page.getByRole("link", { name: "自研项目推进" })).toBeVisible();
+  await expect(page.locator(".detail-route-panel")).toContainText("Carrier Route");
+  await expect(page.locator(".detail-route-panel")).toContainText("研究载体");
+  await expect(page.getByRole("link", { name: "自研项目推进" }).first()).toBeVisible();
 });
 
 test("blog detail page uses dossier-style article shell", async ({ page }) => {
@@ -54,7 +56,9 @@ test("lab detail page uses unified detail shell", async ({ page }) => {
   await page.goto("/lab/research-cadence-demo/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("研究节奏与主题投入");
   await expect(page.locator(".channel-metric").filter({ hasText: "实验类型" }).first()).toBeVisible();
-  await expect(page.getByRole("link", { name: "自研项目推进" })).toBeVisible();
+  await expect(page.locator(".detail-route-panel")).toContainText("Carrier Route");
+  await expect(page.locator(".detail-route-panel")).toContainText("实验载体");
+  await expect(page.getByRole("link", { name: "自研项目推进" }).first()).toBeVisible();
 });
 
 test("about page explains site structure", async ({ page }) => {

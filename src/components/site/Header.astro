@@ -4,6 +4,7 @@ import { siteMeta } from "../../data/site";
 interface NavItem {
   href: string;
   label: string;
+  commandCue?: string;
 }
 
 interface Props {
@@ -20,11 +21,20 @@ const { path, nav } = Astro.props;
       <a href="/">{siteMeta.title}</a>
     </div>
     <div class="site-nav-group">
+      <div class="site-shell-context" aria-live="polite">
+        <span class="site-shell-context__label">当前视角</span>
+        <strong class="site-shell-context__mode site-shell-context__mode--content">研究网站</strong>
+        <strong class="site-shell-context__mode site-shell-context__mode--command">战区总控</strong>
+        <span class="site-shell-context__note site-shell-context__note--content">内容优先</span>
+        <span class="site-shell-context__note site-shell-context__note--command">主题态势优先</span>
+      </div>
+
       <nav class="site-nav" aria-label="站点导航">
         {
           nav.map((item) => (
             <a href={item.href} aria-current={path === item.href ? "page" : undefined}>
-              {item.label}
+              <span class="site-nav__label">{item.label}</span>
+              {item.commandCue && <span class="site-nav__cue">{item.commandCue}</span>}
             </a>
           ))
         }

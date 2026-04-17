@@ -53,12 +53,16 @@ test("homepage strategy mode exposes command views and hides them in default mod
   await page.locator("[data-theme-toggle]").click();
 
   await expect(page.locator("html")).toHaveAttribute("data-theme-capability", "command");
+  await expect(page.locator(".site-shell-context")).toContainText("当前视角");
+  await expect(page.locator(".site-shell-context")).toContainText("战区总控");
   await expect(page.getByRole("heading", { level: 1, name: "先看战区网络，再下达内容调度。" })).toBeVisible();
   await expect(page.getByText("当前主题战区版图")).toBeVisible();
   await expect(page.getByRole("button", { name: /自研项目推进/ }).first()).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator('[data-map-zone="capital"][data-anchor-kind="fixed"]').first()).toBeVisible();
   await expect(page.getByRole("button", { name: /自研项目推进/ }).first()).toHaveAttribute("data-heat-band", /(hot|warm|cool)/);
   await expect(page.getByRole("link", { name: "查看第一资产" })).toHaveCount(0);
+  await expect(page.locator(".sector-command__selection-card").first()).toContainText("当前锁定");
+  await expect(page.getByText("第一步")).toHaveCount(0);
 
   await page.getByRole("button", { name: /AI 工具侦察/ }).first().click();
   await expect(page.getByRole("heading", { level: 3, name: "AI 工具侦察" })).toBeVisible();
@@ -81,7 +85,10 @@ test("research page switches between map archive and timeline in strategy theme"
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "strategy");
   await expect(page.locator("html")).toHaveAttribute("data-theme-capability", "command");
+  await expect(page.getByRole("heading", { level: 2, name: "研究载体，当前先承载一条主线。" })).toBeVisible();
   await expect(page.getByText("把研究方向看成一块正在扫描中的研究战盘")).toBeVisible();
+  await expect(page.getByText("单主线运行", { exact: true })).toBeVisible();
+  await expect(page.getByText("紧凑子地图", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "档案" }).click();
   await expect(page.getByText("把研究条目当作情报卷宗来浏览")).toBeVisible();
