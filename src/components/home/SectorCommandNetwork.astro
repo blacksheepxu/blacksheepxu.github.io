@@ -112,11 +112,11 @@ const getZoneLabelStyle = (x: number, y: number) => `left:${x}%;top:${y}%;`;
           <div class="sector-map-node__plate">
             <span class="sector-map-node__role">{getNodeRoleLabel(node)}</span>
             <div class="sector-map-node__head">
-              <strong>{node.sector.title}</strong>
+              <strong class="sector-map-node__title">{node.sector.title}</strong>
               <span class="sector-map-node__heat">{getSectorHeatLabel(node.sector)}</span>
             </div>
             <span class="sector-map-node__meta">{node.sector.assetCount} 项资产 · {node.sector.dominantTopic}</span>
-            {node.anchorKind !== "peripheral" && <p>{node.sector.summary}</p>}
+            {node.anchorKind !== "peripheral" && <p class="sector-map-node__summary">{node.sector.summary}</p>}
           </div>
         </button>
       ))}

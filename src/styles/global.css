@@ -1395,7 +1395,7 @@ html[data-theme="strategy"] .archive-card__link {
 .sector-map-node {
   position: absolute;
   z-index: 2;
-  width: min(20rem, 38vw);
+  width: min(9rem, 16vw);
   transform: translate(-50%, -50%);
   border: 0;
   background: none;
@@ -1406,6 +1406,8 @@ html[data-theme="strategy"] .archive-card__link {
   cursor: pointer;
   --map-accent: rgba(20, 122, 152, 0.42);
   --map-glow: rgba(20, 122, 152, 0.18);
+  --beacon-size: 2.05rem;
+  --beacon-core: color-mix(in srgb, var(--map-accent) 88%, white 12%);
 }
 
 .sector-map-node[data-anchor-kind="fixed"] {
@@ -1416,46 +1418,86 @@ html[data-theme="strategy"] .archive-card__link {
   z-index: 3;
 }
 
+.sector-map-node[data-anchor-kind="fixed"] {
+  --beacon-size: 2.7rem;
+}
+
+.sector-map-node[data-anchor-kind="dynamic"] {
+  --beacon-size: 2.25rem;
+}
+
 .sector-map-node__marker {
+  position: relative;
   display: inline-flex;
-  width: 1rem;
-  height: 1rem;
+  width: var(--beacon-size);
+  height: var(--beacon-size);
   border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.22);
-  background: var(--map-accent);
+  border: 2px solid color-mix(in srgb, var(--map-accent) 72%, rgba(255, 255, 255, 0.4));
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.82), transparent 28%),
+    radial-gradient(circle at 50% 50%, var(--beacon-core), var(--map-accent));
   box-shadow:
-    0 0 0 5px color-mix(in srgb, var(--map-glow) 72%, transparent),
-    0 0 24px color-mix(in srgb, var(--map-accent) 52%, transparent);
+    0 0 0 12px color-mix(in srgb, var(--map-glow) 82%, transparent),
+    0 0 42px color-mix(in srgb, var(--map-accent) 78%, transparent),
+    0 0 96px color-mix(in srgb, var(--map-accent) 42%, transparent);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+.sector-map-node__marker::before,
+.sector-map-node__marker::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--map-accent) 72%, rgba(255, 255, 255, 0.12));
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0.9;
+  pointer-events: none;
+  animation: sector-beacon-pulse 2.6s ease-out infinite;
+}
+
+.sector-map-node__marker::after {
+  animation-delay: 0.85s;
 }
 
 .sector-map-node__plate {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.14rem;
   width: max-content;
-  max-width: min(20rem, 38vw);
-  margin-top: 0.7rem;
-  padding: 0.95rem 1rem;
-  border-radius: 20px;
-  border: 1px solid color-mix(in srgb, var(--map-accent) 44%, var(--line));
+  max-width: min(7.4rem, 11vw);
+  margin-top: 0.24rem;
+  padding: 0.18rem 0.34rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--map-accent) 14%, transparent);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 36%),
-    var(--surface-strong);
-  box-shadow:
-    0 18px 36px color-mix(in srgb, var(--map-glow) 18%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 36%),
+    color-mix(in srgb, var(--surface-strong) 34%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(6px);
+  opacity: 0.16;
+  transition:
+    transform 180ms ease,
+    opacity 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
 }
 
 .sector-map-node__role,
 .sector-map-node__meta,
 .sector-map-node__heat {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 0.56rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .sector-map-node__role {
   color: var(--accent-strong);
+  opacity: 0.08;
 }
 
 .sector-map-node__head {
@@ -1465,58 +1507,70 @@ html[data-theme="strategy"] .archive-card__link {
   gap: 0.7rem;
 }
 
-.sector-map-node__head strong {
-  font-size: clamp(1.2rem, 2vw, 1.7rem);
+.sector-map-node__title {
+  font-size: clamp(0.68rem, 0.86vw, 0.82rem);
   line-height: 1;
   font-family: var(--font-display);
-  max-width: 12ch;
+  max-width: 9ch;
+  color: color-mix(in srgb, var(--text) 54%, var(--muted));
+  opacity: 0.32;
+  transition:
+    color 180ms ease,
+    opacity 180ms ease;
 }
 
 .sector-map-node__heat {
   display: inline-flex;
   align-items: center;
-  padding: 0.35rem 0.5rem;
+  padding: 0.18rem 0.32rem;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--map-accent) 40%, var(--line));
   background: color-mix(in srgb, var(--map-glow) 35%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--map-glow) 38%, transparent);
+  opacity: 0;
+  transform: translateY(-0.14rem) scale(0.92);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
 }
 
 .sector-map-node__meta {
   color: var(--muted);
+  display: none;
 }
 
-.sector-map-node p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.55;
+.sector-map-node__summary {
+  display: none;
 }
 
 .sector-map-node--flagship {
-  width: min(22rem, 42vw);
+  width: min(10.5rem, 18vw);
+  --beacon-size: 3.15rem;
 }
 
 .sector-map-node--flagship .sector-map-node__plate {
-  max-width: min(22rem, 42vw);
-  padding: 1.05rem 1.1rem;
+  max-width: min(8.15rem, 12vw);
+  padding: 0.24rem 0.42rem;
 }
 
 .sector-map-node--outpost {
-  width: min(13rem, 24vw);
+  width: min(5rem, 7vw);
+  --beacon-size: 1.35rem;
 }
 
 .sector-map-node--outpost .sector-map-node__plate {
-  max-width: min(13rem, 24vw);
-  padding: 0.72rem 0.8rem;
+  max-width: min(4.4rem, 6vw);
+  padding: 0.12rem 0.18rem;
+  gap: 0.18rem;
 }
 
-.sector-map-node--outpost .sector-map-node__head strong {
-  font-size: 0.92rem;
+.sector-map-node--outpost .sector-map-node__title {
+  font-size: 0.56rem;
   max-width: none;
 }
 
 .sector-map-node--outpost .sector-map-node__meta {
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
+  display: none;
 }
 
 .sector-map-node[data-heat-band="cool"] {
@@ -1538,13 +1592,47 @@ html[data-theme="strategy"] .archive-card__link {
   z-index: 6;
 }
 
+.sector-map-node:hover .sector-map-node__plate,
 .sector-map-node[data-focused="true"] .sector-map-node__plate {
   transform: translateY(-4px);
   border-color: color-mix(in srgb, var(--map-accent) 72%, var(--line));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 36%),
+    color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  opacity: 0.84;
   box-shadow:
     0 24px 44px color-mix(in srgb, var(--map-glow) 28%, transparent),
     0 0 0 1px color-mix(in srgb, var(--map-accent) 26%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.sector-map-node:hover .sector-map-node__marker,
+.sector-map-node[data-focused="true"] .sector-map-node__marker {
+  transform: scale(1.12);
+  filter: saturate(1.16);
+  box-shadow:
+    0 0 0 18px color-mix(in srgb, var(--map-glow) 88%, transparent),
+    0 0 54px color-mix(in srgb, var(--map-accent) 90%, transparent),
+    0 0 118px color-mix(in srgb, var(--map-accent) 52%, transparent);
+}
+
+.sector-map-node:hover .sector-map-node__role,
+.sector-map-node[data-focused="true"] .sector-map-node__role,
+.sector-map-node:hover .sector-map-node__meta,
+.sector-map-node[data-focused="true"] .sector-map-node__meta {
+  opacity: 0.68;
+}
+
+.sector-map-node:hover .sector-map-node__title,
+.sector-map-node[data-focused="true"] .sector-map-node__title {
+  color: var(--text);
+  opacity: 1;
+}
+
+.sector-map-node:hover .sector-map-node__heat,
+.sector-map-node[data-focused="true"] .sector-map-node__heat {
+  opacity: 0.94;
+  transform: translateY(0) scale(1);
 }
 
 .sector-inspector {
@@ -3173,6 +3261,20 @@ pre.astro-code {
 
   50% {
     opacity: 0.9;
+  }
+}
+
+@keyframes sector-beacon-pulse {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 0.88;
+  }
+
+  100% {
+    width: 320%;
+    height: 320%;
+    opacity: 0;
   }
 }
 
