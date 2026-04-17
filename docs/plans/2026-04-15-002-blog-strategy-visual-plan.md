@@ -1,14 +1,17 @@
 ---
 title: design: Blog strategy-theme visual plan
 type: design
-status: proposed
+status: archived
 date: 2026-04-15
 related:
   - docs/brainstorms/2026-04-15-strategy-interface-theme-requirements.md
   - docs/plans/2026-04-15-001-feat-strategy-interface-theme-plan.md
+superseded_by: docs/plans/2026-04-17-001-refactor-strategy-theme-product-calibration-plan.md
 ---
 
 # design: Blog strategy-theme visual plan
+
+> Historical note: this blog-focused visual refinement doc is no longer the recommended execution source. Its useful visual ideas have been absorbed into the shipped strategy surfaces and the later product-calibration work.
 
 ## Why This Exists
 

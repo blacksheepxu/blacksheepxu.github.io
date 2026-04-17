@@ -1,12 +1,15 @@
 ---
 title: feat: Add strategy interface theme
 type: feat
-status: active
+status: superseded
 date: 2026-04-15
 origin: docs/brainstorms/2026-04-15-strategy-interface-theme-requirements.md
+superseded_by: docs/plans/2026-04-16-001-feat-sector-command-theme-governance-plan.md
 ---
 
 # feat: Add strategy interface theme
+
+> Historical note: this was the first strategy-theme implementation plan. It should no longer be used as the execution entrypoint. Use `docs/plans/2026-04-16-001-feat-sector-command-theme-governance-plan.md` and later completed follow-up plans instead.
 
 ## Overview
 
