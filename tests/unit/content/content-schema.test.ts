@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { labEntrySchema, researchEntrySchema } from "../../../src/lib/content/entry-schemas";
+import { labEntrySchema, projectEntrySchema, researchEntrySchema } from "../../../src/lib/content/entry-schemas";
 import { postSchema } from "../../../src/lib/content/post-schema";
 import { siteMeta } from "../../../src/data/site";
 
@@ -74,6 +74,40 @@ describe("research and lab schemas", () => {
       title: "实验标题",
       description: "实验说明",
       updatedAt: "not-a-date"
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts project entries with related research links", () => {
+    const result = projectEntrySchema.safeParse({
+      title: "Git to Blog",
+      description: "把项目过程发布成项目卷宗。",
+      projectId: "git2blog",
+      status: "active",
+      startedAt: "2026-04-18",
+      updatedAt: "2026-04-18",
+      sourceRepos: ["/tmp/git2blog"],
+      relatedResearch: ["ai-research-station"],
+      tags: ["automation"],
+      featured: true
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects invalid project status values", () => {
+    const result = projectEntrySchema.safeParse({
+      title: "Git to Blog",
+      description: "把项目过程发布成项目卷宗。",
+      projectId: "git2blog",
+      status: "draft",
+      startedAt: "2026-04-18",
+      updatedAt: "2026-04-18",
+      sourceRepos: ["/tmp/git2blog"],
+      relatedResearch: [],
+      tags: [],
+      featured: false
     });
 
     expect(result.success).toBe(false);

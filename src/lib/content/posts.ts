@@ -5,6 +5,7 @@ import { getCollectionSlugFromId, getPostHref as getPostHrefForPost, isLegacyPos
 export type PostEntry = CollectionEntry<"posts">;
 export type ResearchEntry = CollectionEntry<"research">;
 export type LabEntry = CollectionEntry<"lab">;
+export type ProjectEntry = CollectionEntry<"projects">;
 export { isLegacyPost } from "./post-routing";
 
 export async function getPosts(): Promise<PostEntry[]> {
@@ -30,11 +31,22 @@ export async function getLabEntries(): Promise<LabEntry[]> {
   return entries.sort((left: LabEntry, right: LabEntry) => left.data.order - right.data.order);
 }
 
+export async function getProjectEntries(): Promise<ProjectEntry[]> {
+  const entries = await getCollection("projects");
+  return entries.sort((left: ProjectEntry, right: ProjectEntry) => {
+    if (left.data.featured !== right.data.featured) {
+      return left.data.featured ? -1 : 1;
+    }
+
+    return right.data.updatedAt.getTime() - left.data.updatedAt.getTime();
+  });
+}
+
 export function getPostHref(post: PostEntry) {
   return getPostHrefForPost(post);
 }
 
-export function getCollectionSlug(entry: ResearchEntry | LabEntry) {
+export function getCollectionSlug(entry: ResearchEntry | LabEntry | ProjectEntry) {
   return getCollectionSlugFromId(entry.id);
 }
 
