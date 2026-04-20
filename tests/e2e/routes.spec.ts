@@ -72,7 +72,7 @@ test("project detail page links back to related research tracks", async ({ page 
   await page.goto("/projects/git-to-blog/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Git to Blog");
   await expect(page.locator(".detail-route-panel")).toContainText("项目卷宗");
-  await expect(page.getByRole("link", { name: "当前研究版图" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "当前研究版图" }).first()).toBeVisible();
 });
 
 test("about page explains site structure", async ({ page }) => {
