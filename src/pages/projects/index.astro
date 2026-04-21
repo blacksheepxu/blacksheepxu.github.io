@@ -1,0 +1,42 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChannelHero from "../../components/site/ChannelHero.astro";
+import ProjectCard from "../../components/projects/ProjectCard.astro";
+import { getCollectionSlug, getProjectEntries, type ProjectEntry } from "../../lib/content/posts";
+import { siteMeta } from "../../data/site";
+
+const entries = await getProjectEntries();
+const activeCount = entries.filter((entry) => entry.data.status === "active").length;
+const relatedResearchCount = new Set(entries.flatMap((entry) => entry.data.relatedResearch)).size;
+const latestUpdate = entries[0]?.data.updatedAt.toISOString().slice(0, 10) ?? "-";
+---
+
+<BaseLayout title={`项目 | ${siteMeta.title}`} description="项目卷宗、长期推进记录与发布入口。" path="/projects">
+  <ChannelHero
+    pathLabel="项目"
+    eyebrow="Project Dossiers"
+    title="项目"
+    summary="这里承接项目级别的长期卷宗：比单篇文章更连续，比研究轨道更贴近真实推进过程。"
+    chips={entries.map((entry) => ({ label: entry.data.projectId, href: `/projects/${getCollectionSlug(entry)}/` }))}
+    metrics={[
+      { label: "项目卷宗", value: entries.length },
+      { label: "活跃项目", value: activeCount },
+      { label: "关联研究", value: relatedResearchCount },
+      { label: "最近更新", value: latestUpdate }
+    ]}
+    noteTitle="Project Note"
+    note="项目页是研究站里的推进卷宗层：它负责说明一个项目如何形成、如何推进，以及当前停在什么位置。"
+  />
+
+  <section class="page-section panel">
+    <div class="section-head">
+      <div>
+        <h2>当前项目卷宗</h2>
+        <p>这里优先展示那些值得持续维护、且会反复进入审核和发布流程的项目档案。</p>
+      </div>
+    </div>
+    <div class="card-grid">
+      {entries.map((entry: ProjectEntry) => <ProjectCard entry={entry} />)}
+    </div>
+  </section>
+</BaseLayout>

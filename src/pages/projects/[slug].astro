@@ -1,0 +1,87 @@
+---
+import { getCollection, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryDetailShell from "../../components/site/EntryDetailShell.astro";
+import { getCollectionSlug, type ProjectEntry, type ResearchEntry } from "../../lib/content/posts";
+
+interface Props {
+  entry: ProjectEntry;
+}
+
+interface RelatedResearchLink {
+  slug: string;
+  title: string;
+}
+
+export const getStaticPaths = (async () => {
+  const entries = await getCollection("projects");
+  return entries.map((entry: ProjectEntry) => ({
+    params: { slug: getCollectionSlug(entry) },
+    props: { entry }
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props as Props;
+const { Content } = await render(entry);
+const researchEntries = (await getCollection("research")) as ResearchEntry[];
+const researchMap = new Map<string, ResearchEntry>(researchEntries.map((research: ResearchEntry) => [getCollectionSlug(research), research]));
+const relatedResearch = entry.data.relatedResearch
+  .map((slug: string): RelatedResearchLink | null => {
+    const research = researchMap.get(slug);
+    if (!research) {
+      return null;
+    }
+
+    return {
+      slug,
+      title: research.data.title
+    };
+  })
+  .filter((item: RelatedResearchLink | null): item is RelatedResearchLink => item !== null);
+const projectTags = entry.data.tags.map((tag: string) => ({ label: `#${tag}` }));
+const relatedResearchChips = relatedResearch.map((research: RelatedResearchLink) => ({
+  label: research.title,
+  href: `/research/${research.slug}/`
+}));
+const statusLabelMap: Record<ProjectEntry["data"]["status"], string> = {
+  active: "活跃推进",
+  paused: "暂停整理",
+  archived: "归档完成"
+};
+---
+
+<BaseLayout title={`${entry.data.title} | 项目`} description={entry.data.description} path="/projects">
+  <EntryDetailShell
+    title={entry.data.title}
+    summary={entry.data.description}
+    eyebrow="Project Detail"
+    pathTrail={[
+      { label: "项目", href: "/projects" },
+      { label: entry.data.title }
+    ]}
+    chips={[
+      { label: entry.data.projectId },
+      { label: entry.data.status },
+      ...projectTags,
+      ...relatedResearchChips
+    ]}
+    metrics={[
+      { label: "项目状态", value: entry.data.status },
+      { label: "关联研究", value: relatedResearch.length },
+      { label: "来源仓库", value: entry.data.sourceRepos.length },
+      { label: "最近更新", value: entry.data.updatedAt.toISOString().slice(0, 10) }
+    ]}
+    noteTitle="Project Detail"
+    note="项目详情页承担推进卷宗角色：它负责把某个项目的过程、判断和下一步收拢到同一个阅读界面。"
+    contextTitle="Carrier Route"
+    contextSummary="这是一份项目卷宗。先在这里理解项目推进脉络，再返回相关研究轨道查看更长期的主题背景。"
+    contextChips={[
+      { label: "项目卷宗" },
+      { label: statusLabelMap[entry.data.status] },
+      ...relatedResearchChips
+    ]}
+  >
+    <Content />
+  </EntryDetailShell>
+</BaseLayout>

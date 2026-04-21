@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollectionSlug } from "../../lib/content/posts";
+
+interface Props {
+  entry: CollectionEntry<"projects">;
+}
+
+const { entry } = Astro.props;
+---
+
+<article class="content-card content-card--signal">
+  <div class="archive-card__head">
+    <span class="card-kicker">Project Dossier</span>
+    <span class="meta-chip">{entry.data.status}</span>
+  </div>
+  <h3 class="archive-card__title">
+    <a href={`/projects/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>
+  </h3>
+  <p class="archive-card__summary">{entry.data.description}</p>
+  <div class="meta-row">
+    <span class="meta-chip">{entry.data.projectId}</span>
+    <span class="meta-chip meta-chip--soft">{entry.data.featured ? "重点项目" : "持续维护"}</span>
+  </div>
+  <div class="archive-card__footer">
+    <span class="archive-card__source">项目卷宗</span>
+    <a class="archive-card__link" href={`/projects/${getCollectionSlug(entry)}/`}>
+      查看项目
+    </a>
+  </div>
+</article>

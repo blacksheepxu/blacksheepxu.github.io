@@ -61,6 +61,20 @@ test("lab detail page uses unified detail shell", async ({ page }) => {
   await expect(page.getByRole("link", { name: "自研项目推进" }).first()).toBeVisible();
 });
 
+test("projects page presents dossier entries", async ({ page }) => {
+  await page.goto("/projects/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("项目");
+  await expect(page.locator(".channel-metric").filter({ hasText: "项目卷宗" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "查看项目" }).first()).toBeVisible();
+});
+
+test("project detail page links back to related research tracks", async ({ page }) => {
+  await page.goto("/projects/git-to-blog/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Git to Blog");
+  await expect(page.locator(".detail-route-panel")).toContainText("项目卷宗");
+  await expect(page.getByRole("link", { name: "当前研究版图" }).first()).toBeVisible();
+});
+
 test("about page explains site structure", async ({ page }) => {
   await page.goto("/about/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("关于这个站");
