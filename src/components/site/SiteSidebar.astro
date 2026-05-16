@@ -1,0 +1,151 @@
+---
+import { siteMeta } from "../../data/site";
+import { getLabEntries, getPosts, getProjectEntries, getResearchEntries } from "../../lib/content/posts";
+
+const [posts, researchEntries, labEntries, projectEntries] = await Promise.all([
+  getPosts(),
+  getResearchEntries(),
+  getLabEntries(),
+  getProjectEntries()
+]);
+
+const latestPost = posts[0];
+const stats = [
+  { label: "文章", value: posts.length, href: "/blog/" },
+  { label: "研究", value: researchEntries.length, href: "/research/" },
+  { label: "项目", value: projectEntries.length, href: "/projects/" },
+  { label: "实验", value: labEntries.length, href: "/lab/" }
+];
+
+const quickLinks = [
+  { label: "博客归档", href: "/blog/", cue: "Writing" },
+  { label: "研究版图", href: "/research/", cue: "Research" },
+  { label: "项目卷宗", href: "/projects/", cue: "Projects" },
+  { label: "交互实验", href: "/lab/", cue: "Lab" }
+];
+
+const sidebarScript = `
+(() => {
+  const sidebar = document.querySelector("[data-site-sidebar]");
+  const overlay = document.querySelector("[data-site-sidebar-overlay]");
+  const toggles = document.querySelectorAll("[data-site-sidebar-toggle]");
+  const closeButton = document.querySelector("[data-site-sidebar-close]");
+  const topButton = document.querySelector("[data-site-sidebar-top]");
+
+  if (!sidebar || !overlay || toggles.length === 0) {
+    return;
+  }
+
+  let lastFocused = null;
+
+  const setOpen = (open) => {
+    sidebar.dataset.open = String(open);
+    sidebar.setAttribute("aria-hidden", String(!open));
+    overlay.hidden = !open;
+    document.documentElement.dataset.siteSidebarOpen = String(open);
+    toggles.forEach((toggle) => toggle.setAttribute("aria-expanded", String(open)));
+
+    if (open) {
+      lastFocused = document.activeElement;
+      closeButton?.focus();
+      return;
+    }
+
+    if (lastFocused instanceof HTMLElement) {
+      lastFocused.focus();
+    }
+  };
+
+  toggles.forEach((toggle) => {
+    toggle.addEventListener("click", () => {
+      setOpen(sidebar.dataset.open !== "true");
+    });
+  });
+
+  closeButton?.addEventListener("click", () => setOpen(false));
+  overlay.addEventListener("click", () => setOpen(false));
+  topButton?.addEventListener("click", () => {
+    setOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && sidebar.dataset.open === "true") {
+      setOpen(false);
+    }
+  });
+})();
+`;
+---
+
+<button
+  class="site-sidebar-toggle"
+  type="button"
+  data-site-sidebar-toggle
+  aria-controls="site-sidebar"
+  aria-expanded="false"
+  aria-label="打开站点侧栏"
+>
+  <span class="site-sidebar-toggle__mark" aria-hidden="true">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
+  <span class="site-sidebar-toggle__text">索引</span>
+</button>
+
+<div class="site-sidebar-overlay" data-site-sidebar-overlay hidden></div>
+
+<aside id="site-sidebar" class="site-sidebar" data-site-sidebar aria-hidden="true">
+  <div class="site-sidebar__panel" role="dialog" aria-modal="true" aria-labelledby="site-sidebar-title">
+    <header class="site-sidebar__header">
+      <div>
+        <p class="site-sidebar__eyebrow">Site Index</p>
+        <h2 id="site-sidebar-title">{siteMeta.title}</h2>
+      </div>
+      <button class="site-sidebar__close" type="button" data-site-sidebar-close aria-label="关闭站点侧栏">
+        <span aria-hidden="true"></span>
+      </button>
+    </header>
+
+    <section class="site-sidebar__stats" aria-label="站点统计">
+      {stats.map((item) => (
+        <a href={item.href}>
+          <strong>{item.value}</strong>
+          <span>{item.label}</span>
+        </a>
+      ))}
+    </section>
+
+    <section class="site-sidebar__section" aria-labelledby="site-sidebar-route-title">
+      <h3 id="site-sidebar-route-title">快速入口</h3>
+      <div class="site-sidebar__links">
+        {quickLinks.map((link) => (
+          <a href={link.href}>
+            <span>{link.label}</span>
+            <small>{link.cue}</small>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="site-sidebar__section" aria-labelledby="site-sidebar-focus-title">
+      <h3 id="site-sidebar-focus-title">研究焦点</h3>
+      <ol class="site-sidebar__focus">
+        {siteMeta.focusAreas.map((area, index) => (
+          <li>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{area}</strong>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <footer class="site-sidebar__footer">
+      <p>{latestPost ? `最近文章：${latestPost.data.title}` : siteMeta.tagline}</p>
+      <button class="site-sidebar__top" type="button" data-site-sidebar-top>回到顶部</button>
+    </footer>
+  </div>
+</aside>
+
+<script is:inline set:html={sidebarScript}></script>

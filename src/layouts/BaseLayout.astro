@@ -4,6 +4,7 @@ import "katex/dist/katex.min.css";
 import Header from "../components/site/Header.astro";
 import Footer from "../components/site/Footer.astro";
 import MathRenderer from "../components/site/MathRenderer.astro";
+import SiteSidebar from "../components/site/SiteSidebar.astro";
 import { siteMeta } from "../data/site";
 import { defaultTheme, defaultThemeId, themeRegistry } from "../lib/theme/theme-registry";
 
@@ -153,6 +154,7 @@ const themeControllerScript = `
         <slot />
       </main>
       <Footer />
+      <SiteSidebar />
     </div>
     <MathRenderer />
     <script is:inline set:html={themeControllerScript}></script>
