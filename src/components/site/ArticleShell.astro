@@ -1,6 +1,7 @@
 ---
 import { isLegacyPost, type PostEntry } from "../../lib/content/posts";
 import type { ThemeSector } from "../../lib/theme-sectors/sector-graph";
+import CommentSection from "./CommentSection.astro";
 
 interface Props {
   post: PostEntry;
@@ -118,5 +119,9 @@ const routeMeta = [
 
   <div class="article-body panel">
     <slot />
+  </div>
+
+  <div class="article-comments panel">
+    <CommentSection mapping={Astro.url.pathname} />
   </div>
 </article>

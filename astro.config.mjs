@@ -1,13 +1,13 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
-import preact from "@astrojs/preact";
+import sitemap from "@astrojs/sitemap";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
 export default defineConfig({
   output: "static",
   site: "https://blacksheepxu.github.io",
-  integrations: [mdx(), preact()],
+  integrations: [mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex]

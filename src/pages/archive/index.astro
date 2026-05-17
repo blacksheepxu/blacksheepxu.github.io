@@ -1,0 +1,143 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPosts, isLegacyPost, getPostHref } from "../../lib/content/posts";
+
+const posts = await getPosts();
+const legacyPosts = posts.filter(isLegacyPost);
+
+// Group by year
+const postsByYear = new Map<number, typeof legacyPosts>();
+for (const post of legacyPosts) {
+  const year = post.data.pubDate.getFullYear();
+  if (!postsByYear.has(year)) {
+    postsByYear.set(year, []);
+  }
+  postsByYear.get(year)!.push(post);
+}
+
+const years = [...postsByYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout
+  title="归档 | Blacksheep"
+  description="从旧站迁移的归档文章"
+  path="/archive"
+>
+  <div class="archive-page">
+    <div class="archive-hero panel">
+      <span class="eyebrow eyebrow--muted">Archive</span>
+      <h1>归档</h1>
+      <p class="archive-hero__desc">
+        这些文章从旧 Hexo 博客迁移而来，保留了原始内容和时间戳。
+        它们记录了更早期的学习轨迹，可能不反映当前的研究方向和认知水平。
+      </p>
+    </div>
+
+    {years.map((year) => (
+      <section class="archive-year panel">
+        <h2 class="archive-year__heading">{year}</h2>
+        <div class="archive-year__list">
+          {postsByYear.get(year)!.map((post) => (
+            <a class="archive-entry" href={getPostHref(post)}>
+              <div class="archive-entry__date">
+                <span class="status-pill">{post.data.pubDate.toISOString().slice(0, 10)}</span>
+              </div>
+              <div class="archive-entry__body">
+                <h3 class="archive-entry__title">{post.data.title}</h3>
+                {post.data.description && (
+                  <p class="archive-entry__desc">{post.data.description}</p>
+                )}
+                <div class="archive-entry__tags">
+                  {post.data.tags.slice(0, 4).map((tag: string) => (
+                    <span class="meta-chip meta-chip--soft">#{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .archive-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md, 1rem);
+  }
+
+  .archive-hero {
+    padding: var(--space-lg, 1.5rem);
+  }
+
+  .archive-hero h1 {
+    margin-top: var(--space-xs, 0.25rem);
+  }
+
+  .archive-hero__desc {
+    margin-top: var(--space-sm, 0.75rem);
+    color: var(--color-text-muted, #666);
+    max-width: 60ch;
+  }
+
+  .archive-year {
+    padding: var(--space-md, 1rem);
+  }
+
+  .archive-year__heading {
+    font-size: var(--text-lg, 1.125rem);
+    margin-bottom: var(--space-sm, 0.75rem);
+    color: var(--color-text-muted, #666);
+  }
+
+  .archive-year__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm, 0.75rem);
+  }
+
+  .archive-entry {
+    display: flex;
+    gap: var(--space-md, 1rem);
+    padding: var(--space-sm, 0.75rem) var(--space-md, 1rem);
+    border-radius: var(--radius-sm, 4px);
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.15s ease;
+  }
+
+  .archive-entry:hover {
+    background-color: var(--color-surface-hover, #f5f5f5);
+  }
+
+  .archive-entry__date {
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .archive-entry__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .archive-entry__title {
+    font-size: var(--text-base, 1rem);
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .archive-entry__desc {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--color-text-muted, #666);
+    margin-top: var(--space-xs, 0.25rem);
+  }
+
+  .archive-entry__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs, 0.25rem);
+    margin-top: var(--space-xs, 0.25rem);
+  }
+</style>
