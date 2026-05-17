@@ -7,50 +7,19 @@ interface Props {
   totalYears: number;
 }
 
-const { totalPosts, totalTopics, totalYears } = Astro.props;
+const { totalPosts, totalTopics } = Astro.props;
 ---
 
-<section class="hero panel">
-  <div class="hero-grid">
-    <div class="hero-copy">
-      <span class="eyebrow">Research / Writing / Experiments</span>
+<section class="hero-compact panel">
+  <div class="hero-compact__inner">
+    <div class="hero-compact__copy">
       <h1>把研究、写作和实验放在同一个站里。</h1>
-      <p class="lede">{siteMeta.heroSummary}</p>
-      <div class="hero-actions">
-        <a class="button button--primary" href="/research">看研究</a>
-        <a class="button" href="/blog">看文章</a>
-        <a class="button" href="/lab">看实验</a>
-      </div>
+      <p>{siteMeta.description}</p>
     </div>
-    <div class="stack">
-      <div class="metric-grid">
-        <div class="metric-card">
-          <strong>{totalPosts}</strong>
-          <span>已迁入的历史文章</span>
-        </div>
-        <div class="metric-card">
-          <strong>{totalTopics}</strong>
-          <span>可识别的研究主题</span>
-        </div>
-        <div class="metric-card">
-          <strong>{totalYears}</strong>
-          <span>累计内容年份跨度</span>
-        </div>
-      </div>
-      <div class="stat-card system-card">
-        <div class="system-card__head">
-          <span class="eyebrow eyebrow--muted">System Focus</span>
-          <h3>{siteMeta.tagline}</h3>
-        </div>
-        <ul class="signal-list">
-          {siteMeta.focusAreas.map((area) => (
-            <li>
-              <span class="signal-list__index">0{siteMeta.focusAreas.indexOf(area) + 1}</span>
-              <span>{area}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div class="hero-compact__stats">
+      <span class="hero-stat"><strong>{totalPosts}</strong> 篇内容</span>
+      <span class="hero-stat"><strong>{totalTopics}</strong> 个主题</span>
     </div>
+    <a class="button button--primary" href="/blog">浏览内容</a>
   </div>
 </section>

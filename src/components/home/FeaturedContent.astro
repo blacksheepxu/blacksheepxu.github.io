@@ -10,9 +10,9 @@ interface Props {
 const { posts, labEntries } = Astro.props;
 ---
 
-<div class="card-grid">
+<div class="featured-grid">
   {posts.slice(0, 2).map((post) => (
-    <article class="content-card">
+    <article class="content-card content-card--featured">
       <span class="card-kicker">Featured Post</span>
       <h3>
         <a href={getPostHref(post)}>{post.data.title}</a>
@@ -25,7 +25,7 @@ const { posts, labEntries } = Astro.props;
     </article>
   ))}
   {labEntries.slice(0, 1).map((entry) => (
-    <article class="content-card content-card--accent">
+    <article class="content-card content-card--accent content-card--featured">
       <span class="card-kicker">Interactive</span>
       <h3>
         <a href={`/lab/${getCollectionSlug(entry)}/`}>{entry.data.title}</a>

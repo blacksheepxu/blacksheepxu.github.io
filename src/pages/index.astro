@@ -54,7 +54,7 @@ const sectorGraph = buildSectorGraph({ posts, researchEntries, labEntries });
       title="节奏与主题反馈"
       description="最近写了多少，主要写到了哪些主题。"
     >
-      <div class="card-grid">
+      <div class="stats-grid">
         <CadenceSummary buckets={stats.cadence} />
         <TopicDistributionSummary buckets={stats.topics} />
       </div>
