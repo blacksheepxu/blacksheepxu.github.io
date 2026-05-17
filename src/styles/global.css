@@ -744,18 +744,62 @@ html[data-theme-capability="command"] .theme-shell--command {
   max-width: 48rem;
 }
 
-.lede {
-  color: var(--muted);
-  font-size: 1.03rem;
-  line-height: 1.74;
-}
-
-.hero {
-  padding: clamp(1.7rem, 3vw, 2.8rem);
+.hero-compact {
+  padding: 1.4rem 1.8rem;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 40%),
-    radial-gradient(circle at top right, rgba(20, 122, 152, 0.12), transparent 34%),
+    radial-gradient(circle at top right, rgba(20, 122, 152, 0.1), transparent 34%),
     linear-gradient(180deg, rgba(241, 248, 252, 0.94), rgba(231, 241, 247, 0.92));
+}
+
+.hero-compact__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+}
+
+.hero-compact__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hero-compact__copy h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+}
+
+.hero-compact__copy p {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.hero-compact__stats {
+  display: flex;
+  gap: 1.2rem;
+  flex-shrink: 0;
+}
+
+.hero-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.hero-stat strong {
+  font-size: 1.3rem;
+  color: var(--accent-strong);
+  font-family: var(--font-body);
+  letter-spacing: -0.02em;
 }
 
 html[data-theme="strategy"] .site-header__inner,
@@ -843,7 +887,7 @@ html[data-theme="strategy"] .site-nav a[aria-current="page"] .site-nav__cue {
   color: rgba(4, 17, 23, 0.68);
 }
 
-html[data-theme="strategy"] .hero,
+html[data-theme="strategy"] .hero-compact,
 html[data-theme="strategy"] .channel-hero,
 html[data-theme="strategy"] .archive-hero,
 html[data-theme="strategy"] .article-hero {
@@ -853,7 +897,19 @@ html[data-theme="strategy"] .article-hero {
     linear-gradient(180deg, rgba(12, 28, 34, 0.98), rgba(6, 16, 21, 0.96));
 }
 
-html[data-theme="strategy"] .hero-copy h1,
+html[data-theme="strategy"] .hero-compact__copy h1 {
+  color: var(--signal-strong);
+}
+
+html[data-theme="strategy"] .hero-stat strong {
+  color: var(--accent-strong);
+}
+
+html[data-theme="strategy"] .hero-stat {
+  color: var(--muted);
+}
+
+html[data-theme="strategy"] .hero-compact__copy h1,
 html[data-theme="strategy"] .article-hero__copy h1,
 html[data-theme="strategy"] .channel-hero__copy h1,
 html[data-theme="strategy"] .archive-hero__copy h1,
@@ -862,7 +918,7 @@ html[data-theme="strategy"] .research-console__copy h2 {
   color: var(--signal-strong);
 }
 
-html[data-theme="strategy"] .lede,
+html[data-theme="strategy"] .hero-compact__copy p,
 html[data-theme="strategy"] .channel-summary,
 html[data-theme="strategy"] .archive-summary,
 html[data-theme="strategy"] .article-summary,
@@ -3117,33 +3173,6 @@ html[data-theme="strategy"] .site-footer {
   border-color: rgba(84, 180, 169, 0.16);
 }
 
-.hero-grid {
-  display: grid;
-  gap: 1.4rem;
-  grid-template-columns: 1.5fr 1fr;
-}
-
-.hero-copy h1 {
-  margin: 0.8rem 0 1rem;
-  max-width: 11ch;
-  font-size: clamp(2.8rem, 6.2vw, 5.6rem);
-  line-height: 0.88;
-  letter-spacing: -0.06em;
-  color: #132331;
-  font-family: var(--font-display);
-}
-
-.hero-copy p {
-  max-width: 42rem;
-}
-
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-top: 1.4rem;
-}
-
 .button {
   display: inline-flex;
   align-items: center;
@@ -4403,7 +4432,6 @@ pre.astro-code {
 }
 
 @media (max-width: 1100px) {
-  .hero-grid,
   .article-hero__grid,
   .channel-hero__grid,
   .archive-hero__grid,
@@ -4422,7 +4450,6 @@ pre.astro-code {
 }
 
 @media (max-width: 920px) {
-  .hero-grid,
   .article-hero__grid,
   .channel-hero__grid,
   .archive-hero__grid,
@@ -4473,10 +4500,6 @@ pre.astro-code {
 
   .site-shell-context {
     width: 100%;
-  }
-
-  .hero-copy h1 {
-    max-width: none;
   }
 
   .article-hero__copy h1 {
@@ -4556,12 +4579,18 @@ pre.astro-code {
   .article-body,
   .channel-hero,
   .archive-hero,
-  .hero {
+  .hero-compact {
     padding: 1rem;
   }
 
-  .hero-copy h1 {
-    font-size: clamp(2.2rem, 14vw, 3.3rem);
+  .hero-compact__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .hero-compact__copy h1 {
+    font-size: clamp(1.2rem, 6vw, 1.6rem);
   }
 
   .site-nav {
