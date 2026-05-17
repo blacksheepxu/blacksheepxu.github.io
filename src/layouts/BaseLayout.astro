@@ -19,6 +19,8 @@ interface Props {
   description?: string;
   path?: string;
   nav?: NavItem[];
+  image?: string;
+  ogType?: string;
 }
 
 const {
@@ -32,7 +34,9 @@ const {
     { href: "/projects", label: "项目", commandCue: "项目卷宗" },
     { href: "/lab", label: "实验", commandCue: "交互载体" },
     { href: "/about", label: "关于", commandCue: "站点背景" }
-  ]
+  ],
+  image = siteMeta.ogImage,
+  ogType = "website"
 } = Astro.props;
 
 const themeInitScript = `
@@ -145,6 +149,24 @@ const themeControllerScript = `
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={Astro.url.href} />
+    <link rel="alternate" type="application/rss+xml" title={siteMeta.title} href={new URL("/rss.xml", Astro.site).href} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:image" content={new URL(image, Astro.site).href} />
+    <meta property="og:site_name" content={siteMeta.title} />
+    <meta property="og:locale" content="zh_CN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, Astro.site).href} />
+
     <script is:inline set:html={themeInitScript}></script>
   </head>
   <body>

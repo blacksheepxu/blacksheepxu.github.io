@@ -8,6 +8,7 @@ export const siteMeta = {
   themeStorageKey: "blacksheep-theme",
   defaultTheme: defaultThemeId,
   strategyTheme: strategyThemeId,
+  ogImage: "/og-default.png",
   focusAreas: [
     "深度学习与模型理解",
     "研究型笔记与方法归档",
