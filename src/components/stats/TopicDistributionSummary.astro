@@ -76,9 +76,22 @@ const alpha = [...buckets].sort((left, right) => left.label.localeCompare(right.
 
     root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => {
       button.addEventListener("click", () => {
+        root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", "false");
+          delete btn.dataset.active;
+        });
+        button.setAttribute("aria-pressed", "true");
+        button.dataset.active = "true";
+
         render(button.dataset.mode === "alpha" ? alphaItems : defaultItems);
       });
     });
+
+    const initialButton = root.querySelector<HTMLButtonElement>("[data-mode='default']");
+    if (initialButton) {
+      initialButton.setAttribute("aria-pressed", "true");
+      initialButton.dataset.active = "true";
+    }
 
     render(defaultItems);
   });

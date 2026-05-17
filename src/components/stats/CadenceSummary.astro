@@ -77,9 +77,22 @@ const compact = buckets.slice(-6);
 
     root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((button) => {
       button.addEventListener("click", () => {
+        root.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((btn) => {
+          btn.setAttribute("aria-pressed", "false");
+          delete btn.dataset.active;
+        });
+        button.setAttribute("aria-pressed", "true");
+        button.dataset.active = "true";
+
         render(button.dataset.mode === "full" ? full : compact);
       });
     });
+
+    const initialButton = root.querySelector<HTMLButtonElement>("[data-mode='compact']");
+    if (initialButton) {
+      initialButton.setAttribute("aria-pressed", "true");
+      initialButton.dataset.active = "true";
+    }
 
     render(compact);
   });

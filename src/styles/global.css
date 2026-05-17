@@ -674,7 +674,7 @@ html[data-theme="strategy"] .site-sidebar__top {
 
 .page-main {
   display: grid;
-  gap: 1.4rem;
+  gap: 1.8rem;
 }
 
 .theme-shell--content,
@@ -688,7 +688,7 @@ html[data-theme-capability="command"] .theme-shell--command {
 }
 
 .page-section {
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 2.2rem;
 }
 
 .section-head {
@@ -869,6 +869,14 @@ html[data-theme="strategy"] .button:hover {
   box-shadow:
     inset 0 1px 0 rgba(214, 255, 247, 0.12),
     0 14px 28px rgba(0, 0, 0, 0.24);
+}
+
+html[data-theme="strategy"] .button[aria-pressed="true"],
+html[data-theme="strategy"] .button[data-active="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 html[data-theme="strategy"] .meta-chip {
@@ -3130,16 +3138,28 @@ html[data-theme="strategy"] .site-footer {
   border-color: transparent;
 }
 
+.button[aria-pressed="true"],
+.button[data-active="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
 .stack {
   display: grid;
   gap: 1rem;
 }
 
 .metric-grid,
-.card-grid,
 .list-grid {
   display: grid;
   gap: 1rem;
+}
+
+.card-grid {
+  display: grid;
+  gap: 1.2rem;
 }
 
 .list-grid {
@@ -3983,6 +4003,76 @@ pre.astro-code {
   color: var(--muted);
 }
 
+.site-footer__inner {
+  display: grid;
+  gap: 1.2rem;
+  align-items: start;
+}
+
+.site-footer__brand strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-footer__brand p {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.1rem;
+}
+
+.site-footer__nav a {
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.site-footer__nav a:hover {
+  color: var(--accent);
+}
+
+.site-footer__copy {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+.site-footer__copy p {
+  margin: 0;
+}
+
+.not-found {
+  display: grid;
+  gap: 1rem;
+  place-items: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.not-found h1 {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  margin: 0;
+  line-height: 1;
+}
+
+.not-found p {
+  color: var(--muted);
+  font-size: 1.1rem;
+  max-width: 28rem;
+}
+
 .system-card__head {
   display: grid;
   gap: 0.7rem;
@@ -4153,6 +4243,25 @@ pre.astro-code {
   }
 }
 
+@media (max-width: 1100px) {
+  .hero-grid,
+  .article-hero__grid,
+  .channel-hero__grid,
+  .archive-hero__grid,
+  .sector-command__masthead,
+  .sector-command__briefing,
+  .command-board__grid,
+  .sector-command__frame,
+  .sector-command__operations,
+  .sector-network,
+  .sector-deck__masthead,
+  .research-console__grid,
+  .command-view-grid,
+  .about-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
 @media (max-width: 920px) {
   .hero-grid,
   .article-hero__grid,
@@ -4169,15 +4278,18 @@ pre.astro-code {
   .command-view-grid,
   .about-grid,
   .archive-grid,
-  .archive-grid--priority,
-  .archive-briefing,
-  .taxonomy-intel__grid,
-  .card-grid,
-  .metric-grid,
   .list-grid,
   .node-grid,
   .dossier-grid {
     grid-template-columns: 1fr;
+  }
+
+  .archive-grid--priority,
+  .archive-briefing,
+  .card-grid,
+  .metric-grid,
+  .taxonomy-intel__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .site-header {
@@ -4258,6 +4370,10 @@ pre.astro-code {
   .archive-specs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .site-footer__inner {
+    grid-template-columns: 1fr auto;
+  }
 }
 
 @media (max-width: 640px) {
@@ -4319,6 +4435,14 @@ pre.astro-code {
 
   .channel-metrics,
   .archive-specs {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-grid--priority,
+  .archive-briefing,
+  .card-grid,
+  .metric-grid,
+  .taxonomy-intel__grid {
     grid-template-columns: 1fr;
   }
 
