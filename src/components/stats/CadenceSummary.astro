@@ -10,24 +10,32 @@ interface Props {
 
 const { buckets } = Astro.props;
 const compact = buckets.slice(-6);
+const total = buckets.reduce((sum, b) => sum + b.count, 0);
 ---
 
 <div class="stack">
-  <div class="content-card content-card--signal">
-    <span class="card-kicker">Cadence</span>
-    <h3>记录节奏</h3>
-    <p>
-      我希望这里提供的是一种"最近有没有留下痕迹"的观察，而不是用高压的连续天数去要求自己。
-    </p>
-  </div>
-  <div class="stat-card" data-cadence-root data-full={JSON.stringify(buckets)} data-compact={JSON.stringify(compact)}>
-    <div class="meta-row" style="margin-top: 0">
-      <button class="button" type="button" data-mode="compact">最近 6 个节点</button>
-      <button class="button" type="button" data-mode="full">全部</button>
+  <details class="collapse-panel" open>
+    <summary class="collapse-panel__trigger">
+      <div class="collapse-panel__header">
+        <div>
+          <span class="card-kicker">Cadence</span>
+          <h3>记录节奏</h3>
+        </div>
+        <div class="collapse-panel__summary">
+          <span class="meta-chip">{buckets.length} 个节点</span>
+          <span class="meta-chip meta-chip--soft">{total} 篇内容</span>
+        </div>
+      </div>
+    </summary>
+    <div class="stat-card" data-cadence-root data-full={JSON.stringify(buckets)} data-compact={JSON.stringify(compact)}>
+      <div class="meta-row" style="margin-top: 0">
+        <button class="button" type="button" data-mode="compact">最近 6 个节点</button>
+        <button class="button" type="button" data-mode="full">全部</button>
+      </div>
+      <div class="chart-bars" data-chart-bars></div>
+      <p data-chart-summary>这里会显示近阶段内容记录节奏，帮助观察而不是催促更新。</p>
     </div>
-    <div class="chart-bars" data-chart-bars></div>
-    <p data-chart-summary>这里会显示近阶段内容记录节奏，帮助观察而不是催促更新。</p>
-  </div>
+  </details>
 </div>
 
 <script>

@@ -13,21 +13,27 @@ const alpha = [...buckets].sort((left, right) => left.label.localeCompare(right.
 ---
 
 <div class="stack">
-  <div class="content-card content-card--signal">
-    <span class="card-kicker">Topic Spread</span>
-    <h3>主题投入</h3>
-    <p>
-      主题分布帮助我看见自己把内容沉淀到了哪里，也方便决定下一阶段是否需要把某个方向补齐。
-    </p>
-  </div>
-  <div class="stat-card" data-topic-root data-default={JSON.stringify(buckets)} data-alpha={JSON.stringify(alpha)}>
-    <div class="meta-row" style="margin-top: 0">
-      <button class="button" type="button" data-mode="default">按投入排序</button>
-      <button class="button" type="button" data-mode="alpha">按名称排序</button>
+  <details class="collapse-panel" open>
+    <summary class="collapse-panel__trigger">
+      <div class="collapse-panel__header">
+        <div>
+          <span class="card-kicker">Topic Spread</span>
+          <h3>主题投入</h3>
+        </div>
+        <div class="collapse-panel__summary">
+          <span class="meta-chip">{buckets.length} 个主题</span>
+        </div>
+      </div>
+    </summary>
+    <div class="stat-card" data-topic-root data-default={JSON.stringify(buckets)} data-alpha={JSON.stringify(alpha)}>
+      <div class="meta-row" style="margin-top: 0">
+        <button class="button" type="button" data-mode="default">按投入排序</button>
+        <button class="button" type="button" data-mode="alpha">按名称排序</button>
+      </div>
+      <div class="chart-bars" data-chart-bars></div>
+      <p data-chart-summary>主题分布用于看见内容重心，而不是评价哪条线"更值钱"。</p>
     </div>
-    <div class="chart-bars" data-chart-bars></div>
-    <p data-chart-summary>主题分布用于看见内容重心，而不是评价哪条线"更值钱"。</p>
-  </div>
+  </details>
 </div>
 
 <script>

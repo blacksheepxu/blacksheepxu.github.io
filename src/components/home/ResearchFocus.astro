@@ -10,13 +10,15 @@ interface Props {
 const { entries } = Astro.props;
 ---
 
-<div class="card-grid">
-  <article class="content-card content-card--signal">
+<div class="focus-grid">
+  <article class="content-card content-card--signal content-card--featured">
     <span class="card-kicker">Core Tracks</span>
     <h3>我希望这个站长期承载的内容</h3>
     <ul>
       {siteMeta.focusAreas.map((area) => <li>{area}</li>)}
     </ul>
   </article>
-  {entries.slice(0, 2).map((entry) => <ResearchCard entry={entry} />)}
+  <div class="focus-grid__side">
+    {entries.slice(0, 2).map((entry) => <ResearchCard entry={entry} />)}
+  </div>
 </div>

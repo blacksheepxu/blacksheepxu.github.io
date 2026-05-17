@@ -8,18 +8,14 @@ interface Props {
 const { posts } = Astro.props;
 ---
 
-<div class="list-grid">
-  {posts.slice(0, 6).map((post) => (
-    <article class="content-card">
-      <span class="card-kicker">Recent Writing</span>
-      <h3>
-        <a href={getPostHref(post)}>{post.data.title}</a>
-      </h3>
-      <p>{post.data.description}</p>
-      <div class="meta-row">
-        <span class="meta-chip">{post.data.pubDate.toISOString().slice(0, 10)}</span>
-        {post.data.categories.slice(0, 1).map((category: string) => <span class="meta-chip">{category}</span>)}
-      </div>
-    </article>
+<div class="recent-list">
+  {posts.slice(0, 8).map((post) => (
+    <a class="recent-item" href={getPostHref(post)}>
+      <time class="recent-item__date" datetime={post.data.pubDate.toISOString()}>
+        {post.data.pubDate.toISOString().slice(0, 10)}
+      </time>
+      <span class="recent-item__title">{post.data.title}</span>
+      <span class="recent-item__tag">{post.data.categories[0] ?? "研究笔记"}</span>
+    </a>
   ))}
 </div>
